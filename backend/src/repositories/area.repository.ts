@@ -75,6 +75,7 @@ export interface IAreaRepository {
   findBoundaryByAreaId(areaId: number): Promise<Result<AreaBoundary, RequestError>>;
   listMapLayers(): Promise<Result<MapLayer[], RequestError>>;
   countByType(type: AreaType): Promise<Result<number, RequestError>>;
+  findByType(type: AreaType): Promise<Result<Area[], RequestError>>;
   /**
    * Resolves free-text place names (as an upstream feed names them in prose) onto
    * districts, by case-insensitive exact match against `name_en`. Built for `alerts`,
@@ -222,6 +223,22 @@ class AreaRepositoryImpl implements IAreaRepository {
       return ok(rows[0]?.total ?? 0);
     } catch (error) {
       logger.error('countByType failed', { type, error });
+      return err(ERRORS.DATABASE_ERROR);
+    }
+  }
+
+  async findByType(type: AreaType): Promise<Result<Area[], RequestError>> {
+    try {
+      const [rows] = await db.query<AreaRow[]>(
+        `SELECT ${AREA_COLUMNS}
+           FROM ${AREAS_TABLE} a
+          WHERE a.type = ?
+          ORDER BY a.name_en ASC, a.id ASC`,
+        [type],
+      );
+      return ok(rows.map(toArea));
+    } catch (error) {
+      logger.error('findByType failed', { type, error });
       return err(ERRORS.DATABASE_ERROR);
     }
   }

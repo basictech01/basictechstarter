@@ -102,4 +102,19 @@ export const ERRORS = {
   ALERT_EXPIRED: new RequestError('This alert has expired', 60002, 410),
   ALERT_AREA_UNRESOLVED: new RequestError('Alert area could not be resolved', 60004, 422),
   ALERT_SEVERITY_INVALID: new RequestError('Invalid alert severity', 60005, 400),
+
+  // 70xxx — hydromet
+  STATION_NOT_FOUND: new RequestError('Weather station not found', 70001, 404),
+  OBSERVATION_NOT_AVAILABLE: new RequestError(
+    'Weather observation not available for this station',
+    70002,
+    404,
+  ),
+  METRIC_NOT_SUPPORTED: new RequestError('Weather metric not supported', 70003, 400),
+  FORECAST_NOT_AVAILABLE: new RequestError('Weather forecast not available', 70004, 404),
+  THRESHOLD_NOT_DEFINED: new RequestError(
+    'Warning threshold not defined for this station',
+    70005,
+    404,
+  ),
 } as const;

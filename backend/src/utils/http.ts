@@ -77,3 +77,27 @@ export async function fetchText(
 
   return err(lastError);
 }
+
+/**
+ * Fetches a URL as JSON with a timeout and bounded retries.
+ * Same retry logic as fetchText; parses the response as JSON.
+ *
+ * Generic type `T` should match the expected JSON structure.
+ */
+export async function fetchJson<T>(
+  url: string,
+  options: FetchTextOptions = {},
+): Promise<Result<T, RequestError>> {
+  const textResult = await fetchText(url, options);
+  if (textResult.isErr()) {
+    return err(textResult.error);
+  }
+
+  try {
+    const parsed = JSON.parse(textResult.value) as T;
+    return ok(parsed);
+  } catch (error) {
+    logger.warn('failed to parse JSON response', { url, error });
+    return err(ERRORS.UPSTREAM_RESPONSE_INVALID);
+  }
+}

@@ -66,3 +66,12 @@ export const IMD_CAP = {
   FETCH_TIMEOUT_MS: 10_000,
   FETCH_RETRIES: 2,
 } as const;
+
+export const NWDP_CONFIG = {
+  /** Bounds one ingestion run: 1000 records is ~1-2 days of hourly data per dataset. */
+  MAX_RECORDS_PER_RUN: 1000,
+  /** Per-request timeout for CKAN DataStore API. */
+  FETCH_TIMEOUT_MS: 10_000,
+  /** Retries on timeout or transient failure. */
+  FETCH_RETRIES: 2,
+} as const;
