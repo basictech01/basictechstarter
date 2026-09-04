@@ -37,24 +37,42 @@
 
 ---
 
-## Pending - Not Yet Verified ⏳
+## Pending - Requires API Key ⏳
 
-### 3. NWIC/NWDP (Meteorological Observations)
-- **Type:** Hourly weather observations
-- **Planned Data:**
-  - Rainfall (hourly)
-  - Temperature
-  - Wind speed & direction
-  - Relative humidity
-  - Atmospheric pressure
-  - Solar radiation
-  - Groundwater level (where applicable)
-- **Status:** ⏳ NO VERIFIED ENDPOINT FOUND
+### 3. Official IMD API (Weather & Rainfall Data)
+- **Type:** Official India Meteorological Department APIs
+- **Endpoint Base:** `https://api.imd.gov.in/api/v1/`
+- **Available APIs:**
+  1. **District-wise Rainfall** - Daily, weekly, monthly, cumulative data
+     - `GET /districtrainfall` or `/districtrainfall?id={district_id}`
+  2. **Current Weather** - Real-time observations
+     - `GET /currentweather`
+  3. **District-wise Nowcast** - Short-term forecasts
+     - `GET /districtnowcast`
+  4. **Weather Forecasts** - 7-day forecasts by city/district
+     - `GET /cityforecast`
+  5. **Rainfall Forecasts** - 5-7 day rainfall forecasts
+     - `GET /subdivisionrainfallforecast`
+  6. Additional: Marine, Cyclone, NHAI, Lightning, Agromet APIs
+
+- **Status:** ✅ VERIFIED ENDPOINT WORKS (requires API key)
+- **Current Response:** `{"error":"API key missing"}`
+- **Required Data for Uttarakhand Districts:**
+  - Daily rainfall (actual vs normal)
+  - Current temperature, humidity, wind
+  - Weather forecasts (7 days)
+  - Rainfall forecasts (5-7 days)
+  - Nowcast data (hourly)
+
 - **Action Required:**
-  1. Locate actual NWIC/NWDP machine-readable data source
-  2. Verify endpoint works
-  3. Document API contract
-  4. Implement connector
+  1. ✅ Endpoint verified at https://api.imd.gov.in/public/api_reference.html
+  2. **Request IMD API Key** - Contact IMD for free/paid API access
+     - Email: likely through mausam.imd.gov.in or api.imd.gov.in
+     - Status: BLOCKING - need to register and get key
+  3. Set `IMD_API_KEY` environment variable
+  4. Implement connectors for each data type
+  5. Set up hourly refresh schedule for rainfall/nowcast
+  6. Daily refresh for forecasts
 
 ### 4. CWC (Central Water Commission) - River Data
 - **Planned Data:**
