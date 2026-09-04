@@ -81,3 +81,68 @@ export const RoadStatusSchema = z.object({
 });
 
 export type RoadStatus = z.infer<typeof RoadStatusSchema>;
+
+// District Detail Response
+export const DistrictDetailSchema = z.object({
+  district: AreaSchema,
+  tehsils: z.array(AreaSchema),
+  boundary: z.object({
+    areaId: z.number(),
+    geojson: z.unknown(),
+    isPlaceholder: z.boolean(),
+    sourceNote: z.string(),
+    updatedAt: z.string().datetime(),
+  }).nullable(),
+});
+
+export type DistrictDetail = z.infer<typeof DistrictDetailSchema>;
+
+// Alert Response with pagination
+export const AlertResponseSchema = z.object({
+  data: z.array(z.object({
+    id: z.number(),
+    headline: z.string(),
+    severity: z.enum(['info', 'warning', 'alert', 'emergency']),
+    areaId: z.number(),
+    type: z.string(),
+    body: z.string(),
+    validFrom: z.string().datetime(),
+    validUntil: z.string().datetime().nullable(),
+  })),
+  pagination: z.object({
+    cursor: z.number(),
+    hasMore: z.boolean(),
+  }),
+});
+
+export type AlertResponse = z.infer<typeof AlertResponseSchema>;
+
+// Weather/Hydro Response
+export const WeatherResponseSchema = z.object({
+  temperature: z.object({
+    value: z.number(),
+    unit: z.string(),
+  }).nullable(),
+  rainfall: z.object({
+    value: z.number(),
+    unit: z.string(),
+  }).nullable(),
+  humidity: z.object({
+    value: z.number(),
+    unit: z.string(),
+  }).nullable(),
+});
+
+export type WeatherResponse = z.infer<typeof WeatherResponseSchema>;
+
+// Indicators/Statistics Response
+export const IndicatorsResponseSchema = z.array(z.object({
+  indicatorKey: z.string(),
+  label: LocalisedTextSchema.optional(),
+  value: z.number(),
+  unit: z.string().optional(),
+  vintage: z.number().optional(),
+  sourceId: z.number().optional(),
+}));
+
+export type IndicatorsResponse = z.infer<typeof IndicatorsResponseSchema>;

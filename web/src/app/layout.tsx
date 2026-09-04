@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Sidebar } from '@/components/sidebar';
 
 export const metadata: Metadata = {
   title: 'Pahad Pulse — Uttarakhand Intelligence Platform',
@@ -16,7 +17,14 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Sidebar />
+        <main>
+          <div className="content-wrapper">
+            {children}
+          </div>
+        </main>
+      </body>
     </html>
   );
 }

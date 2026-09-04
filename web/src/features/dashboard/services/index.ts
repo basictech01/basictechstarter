@@ -43,7 +43,7 @@ export async function fetchAllDistricts(): Promise<DistrictSummary[]> {
     z.array(DistrictSummarySchema)
   );
 
-  const districts: DistrictSummary[] = areas.map((area) => ({
+  return areas.map((area) => ({
     id: area.id,
     name: area.name.en,
     nameHi: area.name.hi,
@@ -51,6 +51,4 @@ export async function fetchAllDistricts(): Promise<DistrictSummary[]> {
     activeAlerts: 0,
     slug: area.slug,
   }));
-
-  return districts;
 }

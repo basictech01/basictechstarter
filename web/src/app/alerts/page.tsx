@@ -19,7 +19,6 @@ export default async function AlertsPage() {
     alerts = await fetchActiveAlerts(undefined, 50);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load alerts';
-    console.error('Alerts fetch error:', err);
   }
 
   return (
