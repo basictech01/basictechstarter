@@ -172,10 +172,13 @@ describe('NWDP Connector', () => {
       }
     });
 
+    // These five field names were corrected on 2026-09-04 after a live ingestion run against
+    // the real NWDP DataStore API rejected 100% of records for each: the original guesses
+    // didn't match the upstream column names. Verified directly via datastore_search.
     it('humidity has correct measurementField and unit', () => {
       const humidity = NWDP_DATASETS.humidity;
       if (humidity) {
-        expect(humidity.measurementField).toBe('Relative Humidity (%)');
+        expect(humidity.measurementField).toBe('Telemetry Hourly Relative Humidity (%)');
         expect(humidity.measurementUnit).toBe('%');
       }
     });
@@ -183,7 +186,7 @@ describe('NWDP Connector', () => {
     it('wind speed has correct measurementField and unit', () => {
       const windSpeed = NWDP_DATASETS.windSpeed;
       if (windSpeed) {
-        expect(windSpeed.measurementField).toBe('Wind Speed (km/h)');
+        expect(windSpeed.measurementField).toBe('Telemetry Hourly Wind Speed (Km/Hr)');
         expect(windSpeed.measurementUnit).toBe('km/h');
       }
     });
@@ -191,7 +194,7 @@ describe('NWDP Connector', () => {
     it('wind direction has correct measurementField and unit', () => {
       const windDirection = NWDP_DATASETS.windDirection;
       if (windDirection) {
-        expect(windDirection.measurementField).toBe('Wind Direction (°)');
+        expect(windDirection.measurementField).toBe('Telemetry Hourly Wind Direction (Degree)');
         expect(windDirection.measurementUnit).toBe('degrees');
       }
     });
@@ -199,7 +202,8 @@ describe('NWDP Connector', () => {
     it('pressure has correct measurementField and unit', () => {
       const pressure = NWDP_DATASETS.pressure;
       if (pressure) {
-        expect(pressure.measurementField).toBe('Atmospheric Pressure (mb)');
+        // Note the literal underscores — upstream's own inconsistent naming, not a typo here.
+        expect(pressure.measurementField).toBe('Telemetry_Hourly_Atmospheric Pressure (mb)');
         expect(pressure.measurementUnit).toBe('mb');
       }
     });
@@ -207,7 +211,7 @@ describe('NWDP Connector', () => {
     it('solar radiation has correct measurementField and unit', () => {
       const solarRadiation = NWDP_DATASETS.solarRadiation;
       if (solarRadiation) {
-        expect(solarRadiation.measurementField).toBe('Solar Radiation (W/m²)');
+        expect(solarRadiation.measurementField).toBe('Solar Radiation (Watt/m2)');
         expect(solarRadiation.measurementUnit).toBe('W/m²');
       }
     });

@@ -1,14 +1,21 @@
 /**
  * Ingestion CLI.
  *
- * `npm run ingest`            — show every source, its freshness and its connector status
+ * `npm run ingest`            — run every source with an available connector (same as --all)
  * `npm run ingest -- <key>`   — run one source's connector
- * `npm run ingest -- --all`   — run every source with an available connector
+ * `npm run ingest -- --all`   — run every source with an available connector (explicit form)
+ * `npm run ingest -- --status` — show every source's freshness and connector status without
+ *                                 running anything
  *
  * This exists because the operator HTTP endpoints in datasets.md §5 need an authenticated
  * operator role, and `accounts` is not built yet. Rather than invent an interim auth
  * scheme for a privileged endpoint, ingestion is driven from the shell — where access is
  * already controlled by who can reach the server.
+ *
+ * The bare command runs connectors (not just reports on them) because this is an operator
+ * tool invoked deliberately from a shell that already has database and network access —
+ * the same access a run itself requires. A separate `--status` view exists for checking
+ * registry health without side effects.
  */
 import { closeDatabase } from '../src/database/db.js';
 import * as sourceController from '../src/controllers/source.controller.js';
@@ -74,11 +81,23 @@ async function runAll(): Promise<void> {
   }
 }
 
+function printHelp(): void {
+  console.log(`
+Usage:
+  npm run ingest                  Run every source with an available connector
+  npm run ingest -- <source-key>  Run one source's connector
+  npm run ingest -- --all         Run every source with an available connector (explicit)
+  npm run ingest -- --status      Show registry health without running anything
+  npm run ingest -- --help        Show this message
+`);
+}
+
 async function main(): Promise<void> {
   const arg = process.argv[2];
   try {
-    if (arg === undefined) await showStatus();
-    else if (arg === '--all') await runAll();
+    if (arg === undefined || arg === '--all') await runAll();
+    else if (arg === '--status') await showStatus();
+    else if (arg === '--help') printHelp();
     else await runOne(arg);
   } finally {
     await closeDatabase();

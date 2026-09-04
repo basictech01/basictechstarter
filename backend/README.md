@@ -122,16 +122,18 @@ Both languages are always returned; the API does not negotiate locale:
 
 ## Ingestion
 
-`datasets` owns where data came from and whether it can be trusted right now. No connector
-fetches anything yet — each declares itself unavailable with a reason, and the runner records
-a _skipped_ run rather than a failure, so the failure count stays meaningful.
+`datasets` owns where data came from and whether it can be trusted right now. A connector
+without credentials or verification declares itself unavailable with a reason, and the runner
+records a _skipped_ run rather than a failure, so the failure count stays meaningful. IMD CAP
+and the seven NWDP weather connectors are live.
 
 ```
-npm run ingest
+npm run ingest                  # run every source with an available connector
+npm run ingest -- <source-key>  # run one source, e.g. nwdp-rainfall
+npm run ingest -- --status      # show freshness / connector state without running anything
 ```
 
-prints every source with its freshness, last successful run, redistribution status and
-connector state. Adding a real source means writing one `fetch` method and adding a line to
+Adding a real source means writing one `fetch` method and adding a line to
 `src/services/ingestion/index.ts` — the runner, run tracking and freshness rules do not change.
 
 Operator HTTP endpoints (`/api/ops/ingestion/*`) are deferred until `accounts` exists; there is

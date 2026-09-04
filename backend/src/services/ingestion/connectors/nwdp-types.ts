@@ -75,35 +75,44 @@ export const NWDP_DATASETS: Record<string, NWDPDataset> = {
   humidity: {
     sourceKey: 'nwdp-humidity',
     resourceId: 'c3a24685-4642-4f59-ba3b-bf1602181a22',
-    measurementField: 'Relative Humidity (%)',
+    // Verified against a live datastore_search response on 2026-09-04 — the earlier guess
+    // ('Relative Humidity (%)') did not match and caused every record to be rejected.
+    measurementField: 'Telemetry Hourly Relative Humidity (%)',
     measurementUnit: '%',
     storageField: 'humidity_percent',
   },
   windSpeed: {
     sourceKey: 'nwdp-wind-speed',
     resourceId: '70c92f61-e8f3-45e4-8660-940a4664e11f',
-    measurementField: 'Wind Speed (km/h)',
+    // Verified against a live datastore_search response on 2026-09-04.
+    measurementField: 'Telemetry Hourly Wind Speed (Km/Hr)',
     measurementUnit: 'km/h',
     storageField: 'wind_speed_kmh',
   },
   windDirection: {
     sourceKey: 'nwdp-wind-direction',
     resourceId: '51cac61b-12d8-43dd-b609-2a033b3511c5',
-    measurementField: 'Wind Direction (°)',
+    // Verified against a live datastore_search response on 2026-09-04.
+    measurementField: 'Telemetry Hourly Wind Direction (Degree)',
     measurementUnit: 'degrees',
     storageField: 'wind_direction_degrees',
   },
   pressure: {
     sourceKey: 'nwdp-pressure',
     resourceId: '90c6bcb8-dfcc-4363-8575-4b5526d22a3a',
-    measurementField: 'Atmospheric Pressure (mb)',
+    // Verified against a live datastore_search response on 2026-09-04 — note the literal
+    // underscore in "Telemetry_Hourly_Atmospheric Pressure", inconsistent with every other
+    // NWDP dataset's spaced field name. This is upstream's naming, not a typo here.
+    measurementField: 'Telemetry_Hourly_Atmospheric Pressure (mb)',
     measurementUnit: 'mb',
     storageField: 'pressure_mb',
   },
   solarRadiation: {
     sourceKey: 'nwdp-solar-radiation',
     resourceId: 'ed4f0384-687b-4582-a46f-3b9c11b97952',
-    measurementField: 'Solar Radiation (W/m²)',
+    // Verified against a live datastore_search response on 2026-09-04 — upstream uses
+    // "Watt/m2", not the "W/m²" originally assumed.
+    measurementField: 'Solar Radiation (Watt/m2)',
     measurementUnit: 'W/m²',
     storageField: 'solar_radiation_w_m2',
   },

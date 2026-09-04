@@ -31,7 +31,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -46,7 +46,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -61,7 +61,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -76,7 +76,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -91,7 +91,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -106,7 +106,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   ),
   (
@@ -121,7 +121,7 @@ VALUES
     'hourly',
     TRUE,
     'provisional',
-    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation; verification pending.',
+    'NWDP redistribution rights NOT confirmed. Redistribution permitted per public documentation. Verification pending.',
     TRUE
   )
 AS new

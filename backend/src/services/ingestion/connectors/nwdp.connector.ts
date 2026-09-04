@@ -119,9 +119,12 @@ async function processRecord(
     return { kind: 'rejected' };
   }
 
-  // Resolve district.
+  // Resolve district. NWDP's District field casing is inconsistent across stations within
+  // the same dataset (observed: "Almora" but also "PAURI GARHWAL" in the same 1000-record
+  // page), so the map is keyed by an uppercased name and looked up the same way — never
+  // reject a real record over letter casing.
   const districtName = (typeof record.District === 'string' ? record.District : '').trim();
-  const districtId = districtMap.get(districtName);
+  const districtId = districtMap.get(districtName.toUpperCase());
 
   if (!districtId) {
     logger.warn('Unknown district in NWDP record', {
@@ -304,8 +307,8 @@ async function getDistrictMap(): Promise<Result<Map<string, number>, RequestErro
 
   const map = new Map<string, number>();
   for (const area of result.value) {
-    // Store by name.en (English name) for matching NWDP district names.
-    map.set(area.name.en, area.id);
+    // Keyed uppercase — see the case-normalization note where this map is looked up.
+    map.set(area.name.en.toUpperCase(), area.id);
   }
 
   return ok(map);
