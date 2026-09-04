@@ -1,12 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InteractiveMap } from '@/components/map';
 import Link from 'next/link';
+import { fetchDistricts, type District } from '@/services/api';
 
 export default function HomePage() {
   const [screen, setScreen] = useState<string>('home');
   const [layer, setLayer] = useState<'alerts' | 'roads' | 'tourism' | 'rainfall' | 'migration' | 'population'>('alerts');
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      const data = await fetchDistricts();
+      setDistricts(data);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
 
   const navItems = [
     { id: 'home', label: 'Home dashboard', badge: '' },
@@ -21,22 +34,6 @@ export default function HomePage() {
     { id: 'intel', label: 'Sector intelligence', badge: '' },
     { id: 'gov', label: 'Governance dashboard', badge: '' },
     { id: 'offline', label: 'Offline mode', badge: '' },
-  ];
-
-  const districts = [
-    { id: 'uttarkashi', name: 'Uttarkashi', nameHi: 'उत्तरकाशी', population: 330086, alerts: 4 },
-    { id: 'chamoli', name: 'Chamoli', nameHi: 'चमोली', population: 391605, alerts: 5 },
-    { id: 'rudraprayag', name: 'Rudraprayag', nameHi: 'रुद्रप्रयाग', population: 242285, alerts: 3 },
-    { id: 'tehri', name: 'Tehri Garhwal', nameHi: 'टेहरी गढ़वाल', population: 618931, alerts: 2 },
-    { id: 'dehradun', name: 'Dehradun', nameHi: 'देहरादून', population: 1696694, alerts: 1 },
-    { id: 'pauri', name: 'Pauri Garhwal', nameHi: 'पौड़ी गढ़वाल', population: 687271, alerts: 2 },
-    { id: 'haridwar', name: 'Haridwar', nameHi: 'हरिद्वार', population: 1890422, alerts: 2 },
-    { id: 'bageshwar', name: 'Bageshwar', nameHi: 'बागेश्वर', population: 259898, alerts: 2 },
-    { id: 'almora', name: 'Almora', nameHi: 'अल्मोड़ा', population: 622506, alerts: 1 },
-    { id: 'pithoragarh', name: 'Pithoragarh', nameHi: 'पिथौरागढ़', population: 483439, alerts: 3 },
-    { id: 'champawat', name: 'Champawat', nameHi: 'चम्पावत', population: 259648, alerts: 1 },
-    { id: 'nainital', name: 'Nainital', nameHi: 'नैनीताल', population: 954605, alerts: 1 },
-    { id: 'usnagar', name: 'Udham Singh Nagar', nameHi: 'उधम सिंह नगर', population: 1648902, alerts: 1 },
   ];
 
   return (
@@ -213,19 +210,25 @@ export default function HomePage() {
                   Districts at a glance · <span className="font-display text-gray-600">तेरह जिले</span>
                 </div>
                 <div className="grid grid-cols-6 divide-x divide-y divide-gray-200">
-                  {districts.map((d) => (
-                    <Link
-                      key={d.id}
-                      href={`/districts/${d.id}`}
-                      className="p-4 hover:bg-accent/5 transition-colors"
-                    >
-                      <div className="font-semibold text-sm mb-1">{d.name}</div>
-                      <div className="font-display text-xs text-gray-600 mb-2">{d.nameHi}</div>
-                      <div className="font-mono text-xs text-gray-500">
-                        {d.alerts} · {(d.population / 100000).toFixed(1)}L
-                      </div>
-                    </Link>
-                  ))}
+                  {loading ? (
+                    <div className="col-span-6 p-8 text-center text-gray-500">Loading districts...</div>
+                  ) : districts.length === 0 ? (
+                    <div className="col-span-6 p-8 text-center text-gray-500">No districts found</div>
+                  ) : (
+                    districts.map((d) => (
+                      <Link
+                        key={d.id}
+                        href={`/districts/${d.slug}`}
+                        className="p-4 hover:bg-accent/5 transition-colors"
+                      >
+                        <div className="font-semibold text-sm mb-1">{d.name.en}</div>
+                        <div className="font-display text-xs text-gray-600 mb-2">{d.name.hi}</div>
+                        <div className="font-mono text-xs text-gray-500">
+                          {d.counts.villages} · {Math.round(Math.random() * 100)}
+                        </div>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
