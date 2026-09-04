@@ -69,7 +69,6 @@ export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps
 
     const initMap = async () => {
       const L = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
 
       mapRef.current = L.map(mapContainer.current!).setView([29.8, 79.2], 8);
 
@@ -175,7 +174,7 @@ export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps
 
   return (
     <div className="map-wrapper relative w-full">
-      <div ref={mapContainer} className="map-container h-96 md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden border border-border-color" />
+      <div ref={mapContainer} className="map-container h-96 md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden" style={{ border: '1px solid #D4CCBE' }} />
       <div className="map-legend absolute bottom-4 left-4 bg-white rounded-lg shadow-md p-3 text-sm z-400">
         <div className="font-semibold mb-2">Layer: {layer}</div>
         <div className="space-y-1">

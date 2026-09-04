@@ -40,13 +40,13 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-bgLight">
+    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-light)' }}>
       {/* SIDEBAR */}
-      <aside className="sidebar fixed left-0 top-0 w-64 h-screen bg-bgDark text-textLight shadow-md overflow-y-auto z-50">
+      <aside className="sidebar fixed left-0 top-0 w-64 h-screen shadow-md overflow-y-auto z-50" style={{ backgroundColor: 'var(--dark-rail)', color: 'var(--text-light)' }}>
         {/* Logo */}
-        <div className="border-b border-textLight/20 p-6">
-          <h1 className="font-display font-bold text-xl text-bgLight mb-1">PAHAD PULSE</h1>
-          <p className="font-display text-sm text-yellow-400">पहाड़ पल्स</p>
+        <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,.12)' }}>
+          <h1 className="font-display font-bold text-xl mb-1" style={{ color: 'var(--bg-light)' }}>PAHAD PULSE</h1>
+          <p className="font-display text-sm" style={{ color: '#F0A268' }}>पहाड़ पल्स</p>
         </div>
 
         {/* Navigation */}
@@ -57,13 +57,18 @@ export default function HomePage() {
               onClick={() => setScreen(item.id)}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all border-l-4 ${
                 screen === item.id
-                  ? 'bg-white/10 text-white border-l-accent'
-                  : 'text-textLight/80 border-l-transparent hover:bg-white/5'
+                  ? 'text-white'
+                  : ''
               }`}
+              style={{
+                backgroundColor: screen === item.id ? 'rgba(255,255,255,.09)' : 'transparent',
+                color: screen === item.id ? '#FFFFFF' : 'rgba(234,240,236,.8)',
+                borderLeftColor: screen === item.id ? 'var(--primary-accent)' : 'transparent',
+              }}
             >
               <span className="flex-1 text-left">{item.label}</span>
               {item.badge && (
-                <span className="bg-accent/20 text-yellow-300 text-xs px-2 py-1 rounded">
+                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(228,104,31,.22)', color: '#F0A268' }}>
                   {item.badge}
                 </span>
               )}
@@ -72,7 +77,7 @@ export default function HomePage() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-textLight/20 p-4 text-xs text-textLight/60">
+        <div className="p-4 text-xs" style={{ borderTop: '1px solid rgba(255,255,255,.12)', color: 'rgba(234,240,236,.62)' }}>
           Built for Uttarakhand
         </div>
       </aside>
@@ -80,18 +85,18 @@ export default function HomePage() {
       {/* MAIN CONTENT */}
       <main className="ml-64 w-full flex flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-bgLight/90 backdrop-blur-sm border-b border-borderColor px-8 py-4 shadow-sm">
+        <header className="sticky top-0 z-40 backdrop-blur-sm px-8 py-4 shadow-sm" style={{ backgroundColor: 'rgba(250,248,244,.9)', borderBottom: '1px solid rgba(20,32,28,.12)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-display text-2xl font-bold text-textDark">Uttarakhand Home Dashboard</h2>
+              <h2 className="font-display text-2xl font-bold" style={{ color: 'var(--text-dark)' }}>Uttarakhand Home Dashboard</h2>
               <p className="font-display text-sm text-gray-600">उत्तराखंड होम डैशबोर्ड</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-accent/10 border border-accent/40">
-                <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
-                <span className="font-mono text-xs text-accent">LIVE · {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} IST</span>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-full" style={{ backgroundColor: 'rgba(228,104,31,.08)', border: '1px solid rgba(228,104,31,.4)' }}>
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--primary-accent)' }}></span>
+                <span className="font-mono text-xs" style={{ color: 'var(--primary-accent)' }}>LIVE · {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} IST</span>
               </div>
-              <div className="font-mono text-xs px-2 py-1 bg-textDark/5 rounded text-textDark/60">
+              <div className="font-mono text-xs px-2 py-1 rounded" style={{ backgroundColor: 'rgba(20,32,28,.06)', color: 'rgba(20,32,28,.6)' }}>
                 DEMO DATA
               </div>
             </div>
@@ -105,14 +110,14 @@ export default function HomePage() {
               {/* Live Counters */}
               <div className="grid grid-cols-4 gap-4">
                 {[
-                  { icon: '🚌', value: '41,280', label: 'Tourists in State', color: 'border-accent' },
-                  { icon: '🚨', value: '26', label: 'Active Alerts', color: 'border-red-500' },
-                  { icon: '🚫', value: '38', label: 'Road Closures', color: 'border-orange-600' },
-                  { icon: '📡', value: '71%', label: 'Connectivity', color: 'border-bgDark' },
+                  { icon: '🚌', value: '41,280', label: 'Tourists in State', borderColor: '#E4681F' },
+                  { icon: '🚨', value: '26', label: 'Active Alerts', borderColor: '#EF4444' },
+                  { icon: '🚫', value: '38', label: 'Road Closures', borderColor: '#F97316' },
+                  { icon: '📡', value: '71%', label: 'Connectivity', borderColor: '#10241D' },
                 ].map((counter, i) => (
-                  <div key={i} className={`bg-white rounded-lg border-l-4 ${counter.color} p-4 shadow-sm`}>
+                  <div key={i} className="bg-white rounded-lg p-4 shadow-sm" style={{ borderLeft: `4px solid ${counter.borderColor}` }}>
                     <div className="text-3xl mb-2">{counter.icon}</div>
-                    <div className="font-display font-bold text-2xl text-textDark mb-1">{counter.value}</div>
+                    <div className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--text-dark)' }}>{counter.value}</div>
                     <div className="font-mono text-xs text-gray-600">{counter.label}</div>
                   </div>
                 ))}
@@ -120,8 +125,8 @@ export default function HomePage() {
 
               {/* Map Section */}
               <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-2 bg-white rounded-lg border border-borderColor shadow-sm overflow-hidden">
-                  <div className="flex items-center gap-3 p-4 border-b border-borderColor flex-wrap">
+                <div className="col-span-2 bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D4CCBE' }}>
+                  <div className="flex items-center gap-3 p-4 flex-wrap" style={{ borderBottom: '1px solid #D4CCBE' }}>
                     <div className="font-semibold text-sm flex-1">
                       Interactive state map · <span className="font-display text-gray-600">किलवार नक्शा</span>
                     </div>
@@ -129,11 +134,12 @@ export default function HomePage() {
                       <button
                         key={l}
                         onClick={() => setLayer(l.toLowerCase() as any)}
-                        className={`font-mono text-xs px-3 py-1 rounded transition-all ${
-                          layer === l.toLowerCase()
-                            ? 'bg-accent text-white'
-                            : 'bg-gray-100 text-gray-700 hover:border-accent border border-gray-200'
-                        }`}
+                        className="font-mono text-xs px-3 py-1 rounded transition-all border"
+                        style={{
+                          backgroundColor: layer === l.toLowerCase() ? '#E4681F' : '#F3F4F6',
+                          color: layer === l.toLowerCase() ? '#FFFFFF' : '#374151',
+                          borderColor: layer === l.toLowerCase() ? '#E4681F' : '#E5E7EB',
+                        }}
                       >
                         {l}
                       </button>
@@ -142,7 +148,7 @@ export default function HomePage() {
                   <div className="h-96">
                     <InteractiveMap layer={layer} clickable={true} />
                   </div>
-                  <div className="p-3 border-t border-borderColor font-mono text-xs text-gray-600 flex justify-between">
+                  <div className="p-3 font-mono text-xs text-gray-600 flex justify-between" style={{ borderTop: '1px solid #D4CCBE' }}>
                     <span>Click any district to open its dashboard</span>
                     <span>Layer: {layer.charAt(0).toUpperCase() + layer.slice(1)}</span>
                   </div>
@@ -151,7 +157,7 @@ export default function HomePage() {
                 {/* Right Panel */}
                 <div className="space-y-4">
                   {/* State Overview */}
-                  <div className="bg-white rounded-lg border border-borderColor p-4 shadow-sm">
+                  <div className="bg-white rounded-lg p-4 shadow-sm" style={{ border: '1px solid #D4CCBE' }}>
                     <div className="font-mono text-xs text-gray-600 uppercase mb-3 font-semibold">State overview</div>
                     <div className="space-y-2 text-sm">
                       {[
@@ -160,23 +166,38 @@ export default function HomePage() {
                         { k: 'Literacy', v: '78.8%' },
                         { k: 'Districts', v: '13' },
                       ].map((s, i) => (
-                        <div key={i} className="flex justify-between border-b border-gray-200 pb-2">
+                        <div key={i} className="flex justify-between pb-2" style={{ borderBottom: '1px solid #E5E7EB' }}>
                           <span className="text-gray-700">{s.k}</span>
-                          <span className="font-mono font-semibold text-textDark">{s.v}</span>
+                          <span className="font-mono font-semibold" style={{ color: 'var(--text-dark)' }}>{s.v}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Quick Access */}
-                  <div className="bg-white rounded-lg border border-borderColor p-4 shadow-sm">
+                  <div className="bg-white rounded-lg p-4 shadow-sm" style={{ border: '1px solid #D4CCBE' }}>
                     <div className="font-mono text-xs text-gray-600 uppercase mb-3 font-semibold">Quick access</div>
                     <div className="grid grid-cols-2 gap-2">
                       {['Alerts', 'Districts', 'Compare', 'Migration', 'Tourism', 'Weather'].map((q) => (
                         <button
                           key={q}
                           onClick={() => setScreen(q.toLowerCase())}
-                          className="text-xs px-2 py-2 rounded border border-gray-200 bg-gray-50 hover:border-accent hover:text-accent transition-all"
+                          className="text-xs px-2 py-2 rounded transition-all"
+                          style={{
+                            backgroundColor: '#F3F4F6',
+                            border: '1px solid #E5E7EB',
+                            color: '#374151',
+                          }}
+                          onMouseEnter={(e) => {
+                            const target = e.target as HTMLButtonElement;
+                            target.style.borderColor = '#E4681F';
+                            target.style.color = '#E4681F';
+                          }}
+                          onMouseLeave={(e) => {
+                            const target = e.target as HTMLButtonElement;
+                            target.style.borderColor = '#E5E7EB';
+                            target.style.color = '#374151';
+                          }}
                         >
                           {q}
                         </button>
@@ -187,8 +208,8 @@ export default function HomePage() {
               </div>
 
               {/* Districts Grid */}
-              <div className="bg-white rounded-lg border border-borderColor shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-borderColor font-semibold text-sm">
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D4CCBE' }}>
+                <div className="p-4 font-semibold text-sm" style={{ borderBottom: '1px solid #D4CCBE' }}>
                   Districts at a glance · <span className="font-display text-gray-600">तेरह जिले</span>
                 </div>
                 <div className="grid grid-cols-6 divide-x divide-y divide-gray-200">
