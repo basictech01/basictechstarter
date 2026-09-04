@@ -95,9 +95,11 @@ const config: Config = {
       textColor: {
         'text-light': '#EAF0EC',
         'text-dark': '#14201C',
+        'alert-critical': '#DC2626',
       },
       borderColor: {
         'primary-accent': '#E4681F',
+        'alert-critical': '#DC2626',
       },
     },
   },

@@ -1,10 +1,7 @@
-'use client';
-
-import React from 'react';
 import Link from 'next/link';
-import type { DistrictSummary } from '../types';
+import type { DistrictSummary } from '../schemas';
 
-interface DistrictOverviewGridProps {
+export interface DistrictOverviewGridProps {
   districts: DistrictSummary[];
   loading?: boolean;
 }
@@ -16,10 +13,14 @@ export function DistrictOverviewGrid({ districts, loading }: DistrictOverviewGri
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
-          {Array.from({ length: 13 }).map((_, i) => (
-            <div key={i} className="bg-surface-hover h-32 rounded-lg" />
-          ))}
+          {districts.length > 0
+            ? districts.map((d) => <div key={d.id} className="bg-surface-hover h-32 rounded-lg" />)
+            : Array.from({ length: 13 }, (_, i) => `placeholder-${i}`).map((placeholderKey) => (
+                <div key={placeholderKey} className="bg-surface-hover h-32 rounded-lg" />
+              ))}
         </div>
+      ) : districts.length === 0 ? (
+        <p className="text-text-light/60">No districts found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {districts.map((district) => (
@@ -29,22 +30,18 @@ export function DistrictOverviewGrid({ districts, loading }: DistrictOverviewGri
               className="group bg-surface border border-border rounded-lg p-4 hover:border-accent hover:shadow-md transition-all hover:bg-surface-hover"
             >
               <h3 className="font-bold text-sm group-hover:text-accent transition-colors">
-                {district.name}
+                {district.name.en}
               </h3>
-              <p className="text-xs text-text-light/60 mb-3">{district.nameHi}</p>
+              <p className="text-xs text-text-light/60 mb-3">{district.name.hi}</p>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span>Population</span>
-                  <span className="font-semibold">
-                    {(district.population / 100000).toFixed(1)}L
-                  </span>
+                  <span>Tehsils</span>
+                  <span className="font-semibold">{district.counts.tehsils}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span>Active Alerts</span>
-                  <span className={`font-semibold ${district.activeAlerts > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    {district.activeAlerts}
-                  </span>
+                  <span>Villages</span>
+                  <span className="font-semibold">{district.counts.villages}</span>
                 </div>
               </div>
             </Link>

@@ -1,22 +1,20 @@
 import { z } from 'zod';
 import { apiClient } from '@/lib/api';
-import { AreaIndicatorsSchema } from './schemas';
+import { AreaIndicatorsSchema, ComparisonResultSchema, IndicatorSchema } from './schemas';
 
 export async function fetchAreaIndicators(slug: string) {
   return apiClient.get(`/areas/${slug}/indicators`, AreaIndicatorsSchema);
 }
 
-export async function fetchAllIndicators() {
-  return apiClient.get('/indicators', z.array(z.any()));
+export async function fetchAllIndicators(category?: string) {
+  const query = category ? `?category=${encodeURIComponent(category)}` : '';
+  return apiClient.get(`/indicators${query}`, z.array(IndicatorSchema));
 }
 
-export async function fetchIndicatorComparison(slug1: string, slug2: string, categories?: string[]) {
+export async function fetchIndicatorComparison(slugA: string, slugB: string, categories?: string[]) {
   const params = new URLSearchParams();
-  params.append('areas', `${slug1},${slug2}`);
-  if (categories) {
-    categories.forEach(cat => params.append('categories', cat));
-  }
+  params.set('areas', `${slugA},${slugB}`);
+  if (categories && categories.length > 0) params.set('categories', categories.join(','));
 
-  const query = `?${params.toString()}`;
-  return apiClient.get(`/indicators/compare${query}`, z.any());
+  return apiClient.get(`/indicators/compare?${params.toString()}`, ComparisonResultSchema);
 }

@@ -1,28 +1,18 @@
 import { z } from 'zod';
 import { apiClient } from '@/lib/api';
-import { RiverLevelSchema, WeatherDataSchema } from './schemas';
+import { AreaWeatherSchema, WeatherStationSchema, WeatherSummarySchema } from './schemas';
 
-export async function fetchWeatherForArea(slug: string) {
-  return apiClient.get(`/areas/${slug}/weather`, z.any());
+/** District current conditions + its contributing stations — `GET /api/areas/:slug/weather`. */
+export async function fetchAreaWeather(slug: string) {
+  return apiClient.get(`/areas/${slug}/weather`, AreaWeatherSchema);
 }
 
-export async function fetchRiverLevels() {
-  return apiClient.get('/rivers/levels', z.array(RiverLevelSchema));
+/** Every weather station statewide, for the map — `GET /api/weather/stations`. */
+export async function fetchWeatherStations() {
+  return apiClient.get('/weather/stations', z.array(WeatherStationSchema));
 }
 
-export async function fetchReservoirs() {
-  return apiClient.get('/reservoirs', z.any());
-}
-
-export async function fetchStations(cursor?: number, limit: number = 50) {
-  const params = new URLSearchParams();
-  if (cursor) params.append('cursor', cursor.toString());
-  params.append('limit', limit.toString());
-
-  const query = params.toString() ? `?${params.toString()}` : '';
-  return apiClient.get(`/stations${query}`, z.any());
-}
-
-export async function fetchStationSeries(stationId: number) {
-  return apiClient.get(`/stations/${stationId}/series`, z.any());
+/** Statewide rollup for the home dashboard tile — `GET /api/weather/summary`. */
+export async function fetchWeatherSummary() {
+  return apiClient.get('/weather/summary', WeatherSummarySchema);
 }

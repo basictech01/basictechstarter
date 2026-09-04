@@ -1,6 +1,6 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import { DashboardLayout } from '@/components/layouts/dashboard-layout';
+import { AppSidebar } from '@/features/dashboard/components';
 
 export const metadata: Metadata = {
   title: 'Offline Mode — Pahad Pulse',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function OfflinePage() {
   return (
-    <DashboardLayout>
+    <DashboardLayout sidebar={<AppSidebar />}>
       <div className="min-h-screen bg-bg-light">
         <div className="bg-bg-dark text-text-dark py-8 px-6">
           <h1 className="font-display text-4xl font-bold">Offline Mode</h1>

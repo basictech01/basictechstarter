@@ -67,6 +67,9 @@ export const IMD_CAP = {
   FETCH_RETRIES: 2,
 } as const;
 
+/** Weather changes hourly at the source (NWDP cadence); short enough to stay current. */
+export const CACHE_TTL_WEATHER = 10 * 60; // 10m
+
 export const NWDP_CONFIG = {
   /** Bounds one ingestion run: 1000 records is ~1-2 days of hourly data per dataset. */
   MAX_RECORDS_PER_RUN: 1000,

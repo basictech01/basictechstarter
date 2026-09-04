@@ -1,7 +1,7 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import { DashboardLayout } from '@/components/layouts/dashboard-layout';
-import { AlertCard } from '@/features/alerts/components';
+import { AlertCard, AlertFilters } from '@/features/alerts/components';
+import { AppSidebar } from '@/features/dashboard/components';
 import { fetchActiveAlerts } from '@/features/alerts/services';
 
 export const metadata: Metadata = {
@@ -11,20 +11,25 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function AlertsPage() {
+interface AlertsPageProps {
+  searchParams: Promise<{ type?: string; minSeverity?: string }>;
+}
+
+export default async function AlertsPage({ searchParams }: AlertsPageProps) {
+  const { type, minSeverity } = await searchParams;
+
   let alerts = null;
-  let error = null;
+  let error: string | null = null;
 
   try {
-    alerts = await fetchActiveAlerts(undefined, 50);
+    alerts = await fetchActiveAlerts(undefined, 50, { type, minSeverity });
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load alerts';
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout sidebar={<AppSidebar />}>
       <div className="min-h-screen bg-bg-light">
-        {/* Header */}
         <div className="bg-bg-dark text-text-dark py-8 px-6">
           <h1 className="font-display text-4xl font-bold">Live Alerts</h1>
           <p className="text-text-dark/70 mt-2">
@@ -32,8 +37,9 @@ export default async function AlertsPage() {
           </p>
         </div>
 
-        {/* Content */}
         <div className="p-6">
+          <AlertFilters type={type} minSeverity={minSeverity} />
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
               <p className="font-semibold">Unable to load alerts</p>
@@ -41,13 +47,23 @@ export default async function AlertsPage() {
             </div>
           )}
 
-          {!alerts || alerts.data.length === 0 ? (
+          {!error && alerts === null && (
+            <div className="text-center py-12">
+              <p className="font-semibold text-text-dark">Loading alerts…</p>
+            </div>
+          )}
+
+          {alerts && alerts.data.length === 0 && (
             <div className="text-center py-12">
               <p className="text-2xl mb-2">✨</p>
               <p className="font-semibold text-text-dark mb-1">No active alerts</p>
-              <p className="text-text-light/60">All systems normal across Uttarakhand</p>
+              <p className="text-text-light/60">
+                {type || minSeverity ? 'No alerts match these filters.' : 'All systems normal across Uttarakhand.'}
+              </p>
             </div>
-          ) : (
+          )}
+
+          {alerts && alerts.data.length > 0 && (
             <div className="space-y-4">
               <p className="text-sm text-text-light/70">
                 Showing {alerts.data.length} active alert{alerts.data.length !== 1 ? 's' : ''}
@@ -60,11 +76,9 @@ export default async function AlertsPage() {
               </div>
 
               {alerts.pagination.hasMore && (
-                <div className="text-center pt-4">
-                  <button className="bg-accent text-bg-dark px-6 py-2 rounded font-semibold hover:opacity-90 transition-opacity">
-                    Load More
-                  </button>
-                </div>
+                <p className="text-center text-xs text-text-light/50 pt-2">
+                  More alerts are available; narrow the filters above to see fewer at a time.
+                </p>
               )}
             </div>
           )}

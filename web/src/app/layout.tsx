@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Provider } from './provider';
 
 export const metadata: Metadata = {
   title: 'Pahad Pulse — Uttarakhand Intelligence Platform',
@@ -17,7 +18,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body style={{ margin: 0, padding: 0 }}>
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

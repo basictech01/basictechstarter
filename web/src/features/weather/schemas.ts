@@ -1,78 +1,80 @@
 import { z } from 'zod';
 
-export const StationSchema = z.object({
+const LocalisedTextSchema = z.object({
+  en: z.string(),
+  hi: z.string(),
+});
+
+/**
+ * One NWDP source's contribution to a snapshot. Note this is an ARRAY on `WeatherSnapshotOut`
+ * (`latest.provenance`) — up to seven different `source_id`s can each contribute one field
+ * (rainfall, temperature, ...) to the same merged snapshot. This differs from alerts/indicators,
+ * where `provenance` is a single nullable object.
+ */
+const WeatherProvenanceSchema = z.object({
+  sourceKey: z.string(),
+  department: LocalisedTextSchema,
+  url: z.string().nullable(),
+  attribution: z.string(),
+  vintage: z.string(),
+  fetchedAt: z.string(),
+  freshness: z.enum(['fresh', 'stale', 'expired', 'unknown']),
+  mayRedistribute: z.boolean(),
+});
+
+export type WeatherProvenance = z.infer<typeof WeatherProvenanceSchema>;
+
+/** A merged "current conditions" snapshot. Any field is `null` when nothing has reported it. */
+export const WeatherSnapshotSchema = z.object({
+  rainfallMm: z.number().nullable(),
+  temperatureCelsius: z.number().nullable(),
+  humidityPercent: z.number().nullable(),
+  windSpeedKmh: z.number().nullable(),
+  windDirectionDegrees: z.number().nullable(),
+  windDirectionCardinal: z.string().nullable(),
+  pressureMb: z.number().nullable(),
+  solarRadiationWM2: z.number().nullable(),
+  observedAt: z.string().nullable(),
+  provenance: z.array(WeatherProvenanceSchema),
+});
+
+export type WeatherSnapshot = z.infer<typeof WeatherSnapshotSchema>;
+
+export const AreaStationSchema = z.object({
   id: z.number(),
-  sourceStationCode: z.string(),
-  type: z.enum(['weather', 'river', 'reservoir']),
-  name: z.object({
-    en: z.string(),
-    hi: z.string(),
-  }),
-  areaId: z.number(),
-  lat: z.number(),
-  lng: z.number(),
-  riverName: z.string().nullable(),
-  sourceId: z.number(),
+  name: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  latest: WeatherSnapshotSchema,
 });
 
-export type Station = z.infer<typeof StationSchema>;
+export type AreaStation = z.infer<typeof AreaStationSchema>;
 
-export const ObservationSchema = z.object({
-  stationId: z.number(),
-  metric: z.string(),
-  observedAt: z.string().datetime(),
-  value: z.number(),
-  unit: z.string(),
-  sourceId: z.number(),
-  fetchedAt: z.string().datetime(),
+export const AreaWeatherSchema = z.object({
+  district: z.object({ slug: z.string(), name: LocalisedTextSchema }),
+  latest: WeatherSnapshotSchema,
+  stations: z.array(AreaStationSchema),
 });
 
-export type Observation = z.infer<typeof ObservationSchema>;
+export type AreaWeather = z.infer<typeof AreaWeatherSchema>;
 
-export const ThresholdSchema = z.object({
-  stationId: z.number(),
-  level: z.enum(['warning', 'danger', 'hfl']),
-  value: z.number(),
-  unit: z.string(),
-  sourceId: z.number(),
+export const WeatherStationSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  district: z.object({ slug: z.string(), name: LocalisedTextSchema }),
+  latitude: z.number(),
+  longitude: z.number(),
+  latest: WeatherSnapshotSchema,
 });
 
-export type Threshold = z.infer<typeof ThresholdSchema>;
+export type WeatherStation = z.infer<typeof WeatherStationSchema>;
 
-export const RiverLevelSchema = z.object({
-  station: StationSchema,
-  latestLevel: ObservationSchema.extend({
-    delta: z.number().nullable(),
-  }),
-  threshold: ThresholdSchema.nullable(),
-  source: z.object({
-    id: z.number(),
-    department: z.object({
-      en: z.string(),
-      hi: z.string(),
-    }),
-  }),
+export const WeatherSummarySchema = z.object({
+  stationCount: z.number(),
+  districtsCovered: z.number(),
+  latestObservationAt: z.string().nullable(),
+  averageTemperatureCelsius: z.number().nullable(),
+  totalRainfallMmLast24h: z.number(),
 });
 
-export type RiverLevel = z.infer<typeof RiverLevelSchema>;
-
-export const WeatherDataSchema = z.object({
-  temperature: ObservationSchema.optional(),
-  rainfall: ObservationSchema.optional(),
-  humidity: ObservationSchema.optional(),
-  station: StationSchema,
-});
-
-export type WeatherData = z.infer<typeof WeatherDataSchema>;
-
-export const ForecastSchema = z.object({
-  areaId: z.number(),
-  metric: z.string(),
-  validFrom: z.string().datetime(),
-  validTo: z.string().datetime(),
-  value: z.number(),
-  sourceId: z.number(),
-  fetchedAt: z.string().datetime(),
-});
-
-export type Forecast = z.infer<typeof ForecastSchema>;
+export type WeatherSummary = z.infer<typeof WeatherSummarySchema>;

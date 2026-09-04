@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   extends: ['next/core-web-vitals', 'next/typescript'],
   rules: {
     'react-hooks/rules-of-hooks': 'error',

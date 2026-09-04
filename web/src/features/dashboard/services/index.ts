@@ -1,54 +1,45 @@
 import { z } from 'zod';
 import { apiClient } from '@/lib/api';
-import type { LiveCounters, StateOverview, DistrictSummary } from '../types';
-import { DistrictSummarySchema, AlertSummarySchema } from '../schemas';
+import type { LiveCounters, StateOverview } from '../types';
+import { DistrictDetailSchema, DistrictSummarySchema, AlertSummarySchema } from '../schemas';
 
+export async function fetchAllDistricts() {
+  return apiClient.get('/areas/districts', z.array(DistrictSummarySchema));
+}
+
+export async function fetchDistrictDetail(slug: string) {
+  return apiClient.get(`/areas/districts/${slug}`, DistrictDetailSchema);
+}
+
+/**
+ * Counters with no connected backend source (tourists, closed roads, connectivity) are `null`
+ * — see `LiveCountersSchema`. Only `activeAlerts` has a real source today (`/alerts/summary`).
+ */
 export async function fetchLiveCounters(): Promise<LiveCounters> {
-  const [alerts, districts] = await Promise.all([
-    apiClient.get('/alerts/summary', AlertSummarySchema),
-    apiClient.get('/areas/districts', z.array(DistrictSummarySchema)),
-  ]);
-
-  const closedRoads = 0; // TODO: fetch from roads API when available
-  const touristsInState = 0; // TODO: fetch from tourism API when available
-  const connectivityPercentage = 0; // TODO: fetch from connectivity API when available
+  const alerts = await apiClient.get('/alerts/summary', AlertSummarySchema);
 
   return {
-    touristsInState,
     activeAlerts: alerts.activeCount,
-    closedRoads,
-    connectivityPercentage,
+    touristsInState: null, // no tourism data source connected — see tourism.md
+    closedRoads: null, // no roads data source connected — see roads.md
+    connectivityPercentage: null, // no connectivity indicator populated with real values yet
   };
 }
 
+/**
+ * Population, area and literacy have no real ingested values yet (see `StateOverviewSchema`
+ * doc comment) so they render `null`. `districts` and `villages` are real geography counts,
+ * summed from the district list.
+ */
 export async function fetchStateOverview(): Promise<StateOverview> {
-  const districts = await apiClient.get(
-    '/areas/districts',
-    z.array(DistrictSummarySchema)
-  );
+  const districts = await apiClient.get('/areas/districts', z.array(DistrictSummarySchema));
 
   return {
-    population: 10086292,
-    areaKmSq: 53483,
-    literacy: 78.82,
+    population: null,
+    areaKmSq: null,
+    literacy: null,
+    forestCoverage: null,
     districts: districts.length,
-    forestCoverage: 63,
-    villages: 16817,
+    villages: districts.reduce((sum, d) => sum + d.counts.villages, 0),
   };
-}
-
-export async function fetchAllDistricts(): Promise<DistrictSummary[]> {
-  const areas = await apiClient.get(
-    '/areas/districts',
-    z.array(DistrictSummarySchema)
-  );
-
-  return areas.map((area) => ({
-    id: area.id,
-    name: area.name.en,
-    nameHi: area.name.hi,
-    population: 0,
-    activeAlerts: 0,
-    slug: area.slug,
-  }));
 }

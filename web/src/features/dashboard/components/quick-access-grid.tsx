@@ -37,7 +37,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   },
   {
     label: 'Weather & Rivers',
-    href: '/hydromet',
+    href: '/weather',
     icon: '🌧️',
     description: 'Temperature, rainfall, levels',
   },

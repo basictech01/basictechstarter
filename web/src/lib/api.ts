@@ -92,6 +92,10 @@ export const apiClient = {
           500
         );
       }
+      if (error instanceof TypeError) {
+        // A genuine transport failure (offline, DNS, connection refused) — not a server response.
+        throw new ApiError(10099, 'Network unavailable — check your connection', 0);
+      }
       throw error;
     }
   },
@@ -146,6 +150,10 @@ export const apiClient = {
           `Invalid response format: ${error.message}`,
           500
         );
+      }
+      if (error instanceof TypeError) {
+        // A genuine transport failure (offline, DNS, connection refused) — not a server response.
+        throw new ApiError(10099, 'Network unavailable — check your connection', 0);
       }
       throw error;
     }

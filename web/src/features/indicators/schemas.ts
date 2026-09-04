@@ -1,53 +1,62 @@
 import { z } from 'zod';
 
+const LocalisedTextSchema = z.object({
+  en: z.string(),
+  hi: z.string(),
+});
+
 export const IndicatorSchema = z.object({
   key: z.string(),
   category: z.string(),
-  label: z.object({
-    en: z.string(),
-    hi: z.string(),
-  }),
+  scope: z.enum(['state', 'district', 'village']),
+  label: LocalisedTextSchema,
   unit: z.string(),
   decimals: z.number(),
   higherIsBetter: z.boolean().nullable(),
-  scope: z.enum(['state', 'district', 'village']),
 });
 
 export type Indicator = z.infer<typeof IndicatorSchema>;
 
-export const IndicatorValueSchema = z.object({
-  indicatorKey: z.string(),
-  areaId: z.number(),
-  vintage: z.number(),
+const ProvenanceSchema = z
+  .object({
+    sourceKey: z.string().optional(),
+    department: LocalisedTextSchema,
+    url: z.string().nullable(),
+    attribution: z.string(),
+    vintage: z.string(),
+    fetchedAt: z.string(),
+  })
+  .nullable();
+
+const RawValuePointSchema = z.object({
   value: z.number(),
+  vintage: z.string(),
   sourceId: z.number(),
-  fetchedAt: z.string().datetime(),
-  label: z.object({
-    en: z.string(),
-    hi: z.string(),
-  }).optional(),
-  unit: z.string().optional(),
+  fetchedAt: z.string(),
 });
 
-export type IndicatorValue = z.infer<typeof IndicatorValueSchema>;
+/** One area's value for one indicator, provenance-stamped — `GET /areas/:slug/indicators`. */
+export const AreaIndicatorValueSchema = RawValuePointSchema.extend({
+  indicator: IndicatorSchema,
+  provenance: ProvenanceSchema,
+});
 
-export const ProvenanceSchema = z.object({
-  sourceId: z.number(),
-  department: z.object({
-    en: z.string(),
-    hi: z.string(),
-  }),
-  url: z.string().nullable(),
-  attribution: z.string(),
-  vintage: z.string().datetime(),
-  fetchedAt: z.string().datetime(),
-  cadence: z.string(),
-}).optional().nullable();
+export type AreaIndicatorValue = z.infer<typeof AreaIndicatorValueSchema>;
 
-export const AreaIndicatorsSchema = z.array(
-  IndicatorValueSchema.extend({
-    provenance: ProvenanceSchema,
-  })
-);
+export const AreaIndicatorsSchema = z.array(AreaIndicatorValueSchema);
 
-export type AreaIndicators = z.infer<typeof AreaIndicatorsSchema>;
+/** One row of a two-area comparison — only present when both areas have a value (IND-5). */
+export const ComparisonRowSchema = z.object({
+  indicator: IndicatorSchema,
+  areaA: RawValuePointSchema.extend({ provenance: ProvenanceSchema }),
+  areaB: RawValuePointSchema.extend({ provenance: ProvenanceSchema }),
+});
+
+export type ComparisonRow = z.infer<typeof ComparisonRowSchema>;
+
+export const ComparisonResultSchema = z.object({
+  rows: z.array(ComparisonRowSchema),
+  omittedCount: z.number(),
+});
+
+export type ComparisonResult = z.infer<typeof ComparisonResultSchema>;
