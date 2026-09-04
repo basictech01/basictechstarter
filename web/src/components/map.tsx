@@ -2,8 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 interface MapProps {
   layer?: 'alerts' | 'roads' | 'tourism' | 'rainfall' | 'migration' | 'population';
@@ -48,73 +46,47 @@ const mockDistrictData: { [key: string]: string } = {
 };
 
 const districtBoundaries = {
-  Uttarkashi: {
-    center: [30.7, 78.8],
-    bounds: [[30.3, 78.5], [31.2, 79.2]],
-  },
-  Chamoli: {
-    center: [30.2, 79.6],
-    bounds: [[30.0, 79.2], [30.8, 80.2]],
-  },
-  Rudraprayag: {
-    center: [30.3, 79.2],
-    bounds: [[30.0, 78.8], [30.6, 79.6]],
-  },
-  'Pauri Garhwal': {
-    center: [30.1, 78.6],
-    bounds: [[29.6, 78.2], [30.6, 79.0]],
-  },
-  'Tehri Garhwal': {
-    center: [30.4, 78.4],
-    bounds: [[30.0, 78.0], [30.8, 78.8]],
-  },
-  Dehradun: {
-    center: [30.1, 78.1],
-    bounds: [[29.6, 77.6], [30.6, 78.6]],
-  },
-  Almora: {
-    center: [29.6, 79.8],
-    bounds: [[29.2, 79.4], [30.0, 80.2]],
-  },
-  Bageshwar: {
-    center: [29.9, 80.2],
-    bounds: [[29.6, 79.8], [30.2, 80.6]],
-  },
-  Nainital: {
-    center: [29.4, 79.4],
-    bounds: [[29.0, 79.0], [29.8, 79.8]],
-  },
-  Pithoragarh: {
-    center: [29.6, 80.4],
-    bounds: [[29.2, 80.0], [30.0, 80.8]],
-  },
-  Champawat: {
-    center: [29.8, 80.6],
-    bounds: [[29.4, 80.2], [30.2, 81.0]],
-  },
+  Uttarkashi: { center: [30.7, 78.8], bounds: [[30.3, 78.5], [31.2, 79.2]] },
+  Chamoli: { center: [30.2, 79.6], bounds: [[30.0, 79.2], [30.8, 80.2]] },
+  Rudraprayag: { center: [30.3, 79.2], bounds: [[30.0, 78.8], [30.6, 79.6]] },
+  'Pauri Garhwal': { center: [30.1, 78.6], bounds: [[29.6, 78.2], [30.6, 79.0]] },
+  'Tehri Garhwal': { center: [30.4, 78.4], bounds: [[30.0, 78.0], [30.8, 78.8]] },
+  Dehradun: { center: [30.1, 78.1], bounds: [[29.6, 77.6], [30.6, 78.6]] },
+  Almora: { center: [29.6, 79.8], bounds: [[29.2, 79.4], [30.0, 80.2]] },
+  Bageshwar: { center: [29.9, 80.2], bounds: [[29.6, 79.8], [30.2, 80.6]] },
+  Nainital: { center: [29.4, 79.4], bounds: [[29.0, 79.0], [29.8, 79.8]] },
+  Pithoragarh: { center: [29.6, 80.4], bounds: [[29.2, 80.0], [30.0, 80.8]] },
+  Champawat: { center: [29.8, 80.6], bounds: [[29.4, 80.2], [30.2, 81.0]] },
 };
 
 export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps) {
   const router = useRouter();
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
-    mapRef.current = L.map(mapContainer.current).setView([29.8, 79.2], 8);
+    const initMap = async () => {
+      const L = await import('leaflet');
+      await import('leaflet/dist/leaflet.css');
 
-    const bounds = L.latLngBounds([28.6, 77.3], [31.3, 81.2]);
-    mapRef.current.setMaxBounds(bounds);
-    mapRef.current.fitBounds(bounds);
+      mapRef.current = L.map(mapContainer.current!).setView([29.8, 79.2], 8);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19,
-      opacity: 0.2,
-    }).addTo(mapRef.current);
+      const bounds = L.latLngBounds([28.6, 77.3], [31.3, 81.2]);
+      mapRef.current.setMaxBounds(bounds);
+      mapRef.current.fitBounds(bounds);
 
-    addDistrictPolygons(mapRef.current);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+        opacity: 0.2,
+      }).addTo(mapRef.current);
+
+      addDistrictPolygons(mapRef.current, L);
+    };
+
+    initMap().catch(console.error);
 
     return () => {
       if (mapRef.current) {
@@ -142,7 +114,7 @@ export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps
     return colors[intensity] || '#CCCCCC';
   };
 
-  const addDistrictPolygons = (map: L.Map) => {
+  const addDistrictPolygons = (map: any, L: any) => {
     districtData.forEach((district) => {
       const boundary = districtBoundaries[district.name as keyof typeof districtBoundaries];
       if (!boundary) return;
@@ -164,7 +136,7 @@ export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps
         }
       });
 
-      polygon.on('mouseover', function (this: L.Polyline) {
+      polygon.on('mouseover', function (this: any) {
         this.setStyle({
           weight: 3,
           opacity: 1,
@@ -176,7 +148,7 @@ export function InteractiveMap({ layer = 'alerts', clickable = false }: MapProps
         }
       });
 
-      polygon.on('mouseout', function (this: L.Polyline) {
+      polygon.on('mouseout', function (this: any) {
         this.setStyle({
           weight: 2,
           opacity: 1,

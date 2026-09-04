@@ -4,19 +4,18 @@ const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     colors: {
-      'bg-light': '#FAF8F4',
-      'bg-dark': '#10241D',
-      'text-light': '#14201C',
-      'text-dark': '#EAF0EC',
-      'accent': '#E4681F',
-      'border': '#D4CCBE',
-      'surface': '#FFFFFF',
-      'surface-hover': '#F5F3F0',
-      // Standard Tailwind colors
       transparent: 'transparent',
       current: 'currentColor',
       black: '#000',
       white: '#fff',
+      bgLight: '#FAF8F4',
+      bgDark: '#10241D',
+      textDark: '#14201C',
+      textLight: '#EAF0EC',
+      accent: '#E4681F',
+      borderColor: '#D4CCBE',
+      surface: '#FFFFFF',
+      surfaceHover: '#F5F3F0',
       red: {
         50: '#fef2f2',
         100: '#fee2e2',
@@ -53,6 +52,30 @@ const config: Config = {
         800: '#1f2937',
         900: '#111827',
       },
+      yellow: {
+        50: '#fefce8',
+        100: '#fef3c7',
+        200: '#fde68a',
+        300: '#fcd34d',
+        400: '#fbbf24',
+        500: '#f59e0b',
+        600: '#d97706',
+        700: '#b45309',
+        800: '#92400e',
+        900: '#78350f',
+      },
+      orange: {
+        50: '#fff7ed',
+        100: '#ffedd5',
+        200: '#fed7aa',
+        300: '#fdba74',
+        400: '#fb923c',
+        500: '#f97316',
+        600: '#ea580c',
+        700: '#c2410c',
+        800: '#9a3412',
+        900: '#7c2d12',
+      },
     },
     extend: {
       fontFamily: {
@@ -61,10 +84,20 @@ const config: Config = {
         mono: ['var(--font-ibm-plex-mono)', 'monospace'],
       },
       spacing: {
-        'rail': '264px',
+        rail: '264px',
       },
       width: {
-        'rail': '264px',
+        rail: '264px',
+      },
+      backgroundColor: {
+        'dark-rail': '#10241D',
+      },
+      textColor: {
+        'text-light': '#EAF0EC',
+        'text-dark': '#14201C',
+      },
+      borderColor: {
+        'primary-accent': '#E4681F',
       },
     },
   },
