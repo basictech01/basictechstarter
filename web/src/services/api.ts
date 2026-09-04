@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -30,12 +30,24 @@ export interface DistrictDetail extends District {
 
 export async function fetchDistricts(): Promise<District[]> {
   try {
-    const response = await fetch(`${API_BASE}/areas/districts`);
-    if (!response.ok) throw new Error('Failed to fetch districts');
-    const json: ApiResponse<District[]> = await response.json();
-    return json.data || [];
+    const url = `${API_BASE}/areas/districts`;
+    console.log('[API] Fetching from:', url);
+    const response = await fetch(url);
+    console.log('[API] Response status:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const json = await response.json();
+    console.log('[API] Response data length:', json.data?.length || 0);
+
+    if (json.success && Array.isArray(json.data)) {
+      return json.data;
+    }
+    return [];
   } catch (error) {
-    console.error('Error fetching districts:', error);
+    console.error('[API] Error fetching districts:', error);
     return [];
   }
 }

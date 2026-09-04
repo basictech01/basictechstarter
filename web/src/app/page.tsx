@@ -10,23 +10,46 @@ export default function HomePage() {
   const [layer, setLayer] = useState<'alerts' | 'roads' | 'tourism' | 'rainfall' | 'migration' | 'population'>('alerts');
   const [districts, setDistricts] = useState<District[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [alertCount, setAlertCount] = useState(0);
 
   useEffect(() => {
+    console.log('[HomePage] Component mounted');
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) {
+      console.log('[HomePage] Not mounted yet, skipping fetch');
+      return;
+    }
+
+    console.log('[HomePage] Starting to fetch data');
     async function loadData() {
-      setLoading(true);
-      const data = await fetchDistricts();
-      setDistricts(data);
-      setLoading(false);
+      try {
+        console.log('[HomePage] Fetching districts and alerts');
+        const [districtData, alertData] = await Promise.all([
+          fetchDistricts(),
+          fetchAlerts(),
+        ]);
+        console.log('[HomePage] Received', districtData.length, 'districts,', alertData.length, 'alerts');
+        setDistricts(districtData);
+        setAlertCount(alertData.length);
+      } catch (error) {
+        console.error('[HomePage] Failed to load data:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
-  }, []);
+  }, [mounted]);
 
   const navItems = [
     { id: 'home', label: 'Home dashboard', badge: '' },
-    { id: 'alerts', label: 'Live alerts', badge: '26' },
+    { id: 'alerts', label: 'Live alerts', badge: alertCount > 0 ? String(alertCount) : '' },
     { id: 'district', label: 'District dashboard', badge: '' },
     { id: 'compare', label: 'Compare districts', badge: '' },
-    { id: 'roads', label: 'Traffic & roads', badge: '38' },
+    { id: 'roads', label: 'Traffic & roads', badge: '' },
     { id: 'weather', label: 'Weather & rivers', badge: '' },
     { id: 'tourism', label: 'Tourism live', badge: '' },
     { id: 'migration', label: 'Migration tracker', badge: '' },
@@ -107,10 +130,10 @@ export default function HomePage() {
               {/* Live Counters */}
               <div className="grid grid-cols-4 gap-4">
                 {[
-                  { icon: '🚌', value: '41,280', label: 'Tourists in State', borderColor: '#E4681F' },
-                  { icon: '🚨', value: '26', label: 'Active Alerts', borderColor: '#EF4444' },
-                  { icon: '🚫', value: '38', label: 'Road Closures', borderColor: '#F97316' },
-                  { icon: '📡', value: '71%', label: 'Connectivity', borderColor: '#10241D' },
+                  { icon: '🚨', value: String(alertCount), label: 'Active Alerts (IMD CAP)', borderColor: '#EF4444' },
+                  { icon: '🏘️', value: String(districts.length), label: 'Districts Tracked', borderColor: '#E4681F' },
+                  { icon: '⚠️', value: '—', label: 'Road Closures (Pending)', borderColor: '#F97316' },
+                  { icon: '🌡️', value: '—', label: 'Weather Data (Pending)', borderColor: '#0369A1' },
                 ].map((counter, i) => (
                   <div key={i} className="bg-white rounded-lg p-4 shadow-sm" style={{ borderLeft: `4px solid ${counter.borderColor}` }}>
                     <div className="text-3xl mb-2">{counter.icon}</div>
@@ -210,21 +233,23 @@ export default function HomePage() {
                   Districts at a glance · <span className="font-display text-gray-600">तेरह जिले</span>
                 </div>
                 <div className="grid grid-cols-6 divide-x divide-y divide-gray-200">
-                  {loading ? (
-                    <div className="col-span-6 p-8 text-center text-gray-500">Loading districts...</div>
+                  {!mounted ? (
+                    <div className="col-span-6 p-8 text-center text-gray-500">Loading...</div>
                   ) : districts.length === 0 ? (
-                    <div className="col-span-6 p-8 text-center text-gray-500">No districts found</div>
+                    <div className="col-span-6 p-8 text-center text-gray-500">
+                      {loading ? 'Fetching districts...' : 'No districts found'}
+                    </div>
                   ) : (
                     districts.map((d) => (
                       <Link
                         key={d.id}
                         href={`/districts/${d.slug}`}
-                        className="p-4 hover:bg-accent/5 transition-colors"
+                        className="p-4 hover:bg-gray-100 transition-colors"
                       >
                         <div className="font-semibold text-sm mb-1">{d.name.en}</div>
                         <div className="font-display text-xs text-gray-600 mb-2">{d.name.hi}</div>
                         <div className="font-mono text-xs text-gray-500">
-                          {d.counts.villages} · {Math.round(Math.random() * 100)}
+                          {d.counts.villages} villages
                         </div>
                       </Link>
                     ))
