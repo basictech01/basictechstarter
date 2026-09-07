@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { DashboardLayout } from '@/components/layouts/dashboard-layout';
+import { Card } from '@/components/molecules/card';
+import { Kicker } from '@/components/molecules/kicker';
+import { PageHeader } from '@/components/molecules/page-header';
 import { AppSidebar } from '@/features/dashboard/components';
-import { CurrentConditionsCard, StationsTable } from '@/features/weather/components';
+import { CurrentConditionsCard, RainfallByDistrict, StationsTable } from '@/features/weather/components';
 import { fetchWeatherStations, fetchWeatherSummary } from '@/features/weather/services';
-import { describeObservationAge } from '@/features/weather/utils';
+import { aggregateRainfallByDistrict, describeObservationAge } from '@/features/weather/utils';
 
 export const metadata: Metadata = {
   title: 'Weather & Rivers — Pahad Pulse',
@@ -23,87 +26,92 @@ export default async function WeatherPage() {
     error = err instanceof Error ? err.message : 'Failed to load weather data';
   }
 
+  const rainfallByDistrict = stations ? aggregateRainfallByDistrict(stations) : [];
+
   return (
     <DashboardLayout sidebar={<AppSidebar />}>
-      <div className="min-h-screen bg-bg-light">
-        <div className="bg-bg-dark text-text-dark py-8 px-6">
-          <h1 className="font-display text-4xl font-bold">Weather & Rivers</h1>
-          <p className="text-text-dark/70 mt-2">
-            Live NWDP telemetry — rainfall, temperature, humidity, wind, pressure and solar radiation
-          </p>
-        </div>
+      <PageHeader
+        title="Weather & Rivers"
+        titleHi="मौसम एवं नदियाँ"
+        description="Live NWDP telemetry — rainfall, temperature, humidity, wind, pressure and solar radiation"
+      />
 
-        <div className="p-6 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              <p className="font-semibold">Unable to load weather data</p>
-              <p className="text-sm mt-1">{error}</p>
-            </div>
-          )}
+      <div className="space-y-6 p-6 md:p-8">
+        {error && (
+          <div className="rounded-lg border border-alert-critical/30 bg-alert-critical/10 px-4 py-3 text-alert-critical">
+            <p className="font-semibold">Unable to load weather data</p>
+            <p className="mt-1 text-sm">{error}</p>
+          </div>
+        )}
 
-          {!error && summary === null && (
-            <div className="text-center py-12">
-              <p className="font-semibold text-text-dark">Loading weather data…</p>
-            </div>
-          )}
+        {!error && summary === null && (
+          <p className="py-12 text-center font-semibold text-text-dark">Loading weather data…</p>
+        )}
 
-          {summary && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <p className="text-xs text-text-light/60 uppercase">Stations</p>
-                <p className="text-2xl font-bold">{summary.stationCount}</p>
+        {summary && (
+          <Card className="p-5">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div>
+                <Kicker>Stations</Kicker>
+                <p className="font-display mt-1 text-2xl font-semibold">{summary.stationCount}</p>
               </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <p className="text-xs text-text-light/60 uppercase">Districts covered</p>
-                <p className="text-2xl font-bold">{summary.districtsCovered} / 13</p>
+              <div>
+                <Kicker>Districts covered</Kicker>
+                <p className="font-display mt-1 text-2xl font-semibold">{summary.districtsCovered} / 13</p>
               </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <p className="text-xs text-text-light/60 uppercase">Avg. temperature</p>
-                <p className="text-2xl font-bold">
+              <div>
+                <Kicker>Avg. temperature</Kicker>
+                <p className="font-display mt-1 text-2xl font-semibold">
                   {summary.averageTemperatureCelsius !== null
                     ? `${summary.averageTemperatureCelsius.toFixed(1)}°C`
                     : 'No data'}
                 </p>
               </div>
-              <div className="bg-surface border border-border rounded-lg p-4">
-                <p className="text-xs text-text-light/60 uppercase">Rainfall, last 24h</p>
-                <p className="text-2xl font-bold">{summary.totalRainfallMmLast24h}mm</p>
-              </div>
-              <div className="col-span-2 md:col-span-4 text-xs text-text-light/60">
-                Latest observation statewide: {describeObservationAge(summary.latestObservationAt).label}
+              <div>
+                <Kicker>Rainfall, last 24h</Kicker>
+                <p className="font-display mt-1 text-2xl font-semibold">{summary.totalRainfallMmLast24h}mm</p>
               </div>
             </div>
-          )}
+            <p className="mt-4 border-t border-border pt-3 text-xs text-text-dark/55">
+              Latest observation statewide: {describeObservationAge(summary.latestObservationAt).label}
+            </p>
+          </Card>
+        )}
 
-          {stations && stations.length === 0 && (
-            <div className="text-center py-12">
-              <p className="font-semibold text-text-dark">No weather stations reporting yet</p>
-              <p className="text-text-light/60 text-sm mt-1">
-                NWDP telemetry is being onboarded district by district.
-              </p>
-            </div>
-          )}
+        {/*
+          No CWC / India-WRIS river-level source is connected yet (hydromet.md §8) — the ZIP's
+          "River levels" card used fabricated river names and levels, so it is intentionally
+          omitted rather than restyled. This rainfall comparison is built entirely from the real
+          per-station snapshot already fetched above.
+        */}
+        {stations && stations.length > 0 && <RainfallByDistrict data={rainfallByDistrict} />}
 
-          {stations && stations.length > 0 && (
-            <div>
-              <h2 className="font-display text-2xl font-bold mb-4">Stations</h2>
-              <StationsTable stations={stations} />
-            </div>
-          )}
+        {stations && stations.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="font-semibold text-text-dark">No weather stations reporting yet</p>
+            <p className="mt-1 text-sm text-text-dark/60">NWDP telemetry is being onboarded district by district.</p>
+          </div>
+        )}
 
-          {stations && stations.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {stations.slice(0, 4).map((station) => (
-                <CurrentConditionsCard
-                  key={station.id}
-                  title={station.name}
-                  subtitle={station.district.name.en}
-                  snapshot={station.latest}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {stations && stations.length > 0 && (
+          <div>
+            <h2 className="font-display mb-4 text-2xl font-bold">Stations</h2>
+            <StationsTable stations={stations} />
+          </div>
+        )}
+
+        {stations && stations.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {stations.slice(0, 4).map((station) => (
+              <CurrentConditionsCard
+                key={station.id}
+                title={station.name}
+                subtitle={station.district.name.en}
+                snapshot={station.latest}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

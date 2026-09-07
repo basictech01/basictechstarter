@@ -1,3 +1,6 @@
+import { Card } from '@/components/molecules/card';
+import { cn } from '@/lib/utils';
+
 import type { WeatherSnapshot } from '../schemas';
 import { describeObservationAge } from '../utils';
 
@@ -11,7 +14,6 @@ const FIELDS: ReadonlyArray<{
   key: keyof WeatherSnapshot;
   label: string;
   unit: string;
-  format?: (value: number) => string;
 }> = [
   { key: 'temperatureCelsius', label: 'Temperature', unit: '°C' },
   { key: 'rainfallMm', label: 'Rainfall', unit: 'mm' },
@@ -22,10 +24,10 @@ const FIELDS: ReadonlyArray<{
 ];
 
 const FRESHNESS_STYLES: Record<string, string> = {
-  fresh: 'bg-green-100 text-green-800',
-  stale: 'bg-yellow-100 text-yellow-800',
-  expired: 'bg-red-100 text-red-800',
-  unknown: 'bg-gray-100 text-gray-600',
+  fresh: 'bg-green/10 text-green',
+  stale: 'bg-alert-warning/10 text-alert-warning',
+  expired: 'bg-alert-critical/10 text-alert-critical',
+  unknown: 'bg-border/40 text-text-dark/60',
 };
 
 export function CurrentConditionsCard({ title, subtitle, snapshot }: CurrentConditionsCardProps) {
@@ -36,41 +38,40 @@ export function CurrentConditionsCard({ title, subtitle, snapshot }: CurrentCond
       : null;
 
   return (
-    <div className="bg-surface border border-border rounded-lg p-6">
-      <div className="flex items-start justify-between gap-3 mb-4">
+    <Card className="p-5">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-bold text-lg">{title}</h3>
-          {subtitle && <p className="text-xs text-text-light/60">{subtitle}</p>}
+          <h3 className="text-base font-semibold">{title}</h3>
+          {subtitle && <p className="text-xs text-text-dark/55">{subtitle}</p>}
         </div>
-        <span className={`text-xs font-semibold px-2 py-1 rounded ${FRESHNESS_STYLES[age.level]}`}>
+        <span className={cn('flex-none rounded px-2 py-1 text-xs font-semibold', FRESHNESS_STYLES[age.level])}>
           {age.label}
         </span>
       </div>
 
-      <dl className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <dl className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {FIELDS.map((field) => {
           const value = snapshot[field.key];
           return (
             <div key={field.key}>
-              <dt className="text-xs text-text-light/60 uppercase tracking-wide">{field.label}</dt>
-              <dd className="text-lg font-semibold">
+              <dt className="text-xs tracking-wide text-text-dark/55 uppercase">{field.label}</dt>
+              <dd className="font-mono text-lg font-semibold">
                 {typeof value === 'number' ? `${value}${field.unit}` : 'No data'}
               </dd>
             </div>
           );
         })}
         <div>
-          <dt className="text-xs text-text-light/60 uppercase tracking-wide">Wind direction</dt>
-          <dd className="text-lg font-semibold">{windDirection ?? 'No data'}</dd>
+          <dt className="text-xs tracking-wide text-text-dark/55 uppercase">Wind direction</dt>
+          <dd className="font-mono text-lg font-semibold">{windDirection ?? 'No data'}</dd>
         </div>
       </dl>
 
       {snapshot.provenance.length > 0 && (
-        <p className="text-xs text-text-light/50 mt-4 pt-3 border-t border-border">
-          Source{snapshot.provenance.length > 1 ? 's' : ''}:{' '}
-          {snapshot.provenance.map((p) => p.department.en).join(', ')}
+        <p className="mt-4 border-t border-border pt-3 font-mono text-xs text-text-dark/50">
+          Source{snapshot.provenance.length > 1 ? 's' : ''}: {snapshot.provenance.map((p) => p.department.en).join(', ')}
         </p>
       )}
-    </div>
+    </Card>
   );
 }

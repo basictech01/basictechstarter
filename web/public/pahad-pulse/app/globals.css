@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+@theme inline {
+  --font-anek: var(--font-anek);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+
+  --color-pp-bg: #faf8f4;
+  --color-pp-ink: #14201c;
+  --color-pp-forest: #17372e;
+  --color-pp-forest-dark: #10241d;
+  --color-pp-orange: #e4681f;
+  --color-pp-orange-soft: #f0a268;
+  --color-pp-rust: #a8480f;
+  --color-pp-red: #8a1c1c;
+  --color-pp-amber: #c2410c;
+  --color-pp-violet: #4f4c8f;
+  --color-pp-blue: #1d6a8a;
+  --color-pp-green: #2f7a3e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #faf8f4;
+  color: #14201c;
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+}
+
+a {
+  color: #17372e;
+  text-decoration: none;
+}
+a:hover {
+  color: #e4681f;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 32, 28, 0.18);
+  border-radius: 6px;
+}
+
+@keyframes pp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+
+.leaflet-container {
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  background: transparent !important;
+  outline: none;
+}
+.leaflet-interactive {
+  cursor: pointer;
+  transition: fill 0.18s ease;
+}
+.leaflet-tooltip {
+  font-size: 12px;
+  border: 1px solid rgba(20, 32, 28, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(20, 32, 28, 0.12);
+}
+
+.pp-nav-item:hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #ffffff !important;
+}
+.pp-quick:hover {
+  border-color: #e4681f !important;
+  color: #a8480f !important;
+}
+.pp-district-card:hover {
+  background: rgba(228, 104, 31, 0.07) !important;
+}
+.pp-cta:hover {
+  background: #0e241d !important;
+}
+.pp-cta-orange:hover {
+  background: #c2540f !important;
+}
+.pp-focus:focus {
+  border-color: #e4681f !important;
+}

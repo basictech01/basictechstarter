@@ -1,4 +1,7 @@
 import Link from 'next/link';
+
+import { Card, CardTitle } from '@/components/molecules/card';
+
 import type { DistrictSummary } from '../schemas';
 
 export interface DistrictOverviewGridProps {
@@ -8,46 +11,38 @@ export interface DistrictOverviewGridProps {
 
 export function DistrictOverviewGrid({ districts, loading }: DistrictOverviewGridProps) {
   return (
-    <div className="p-6">
-      <h2 className="font-display text-2xl font-bold mb-6">All 13 Districts</h2>
+    <Card className="overflow-hidden">
+      <CardTitle>
+        Districts at a glance ·{' '}
+        <span className="font-display font-normal text-text-dark/55">तेरह जिले</span>
+      </CardTitle>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
-          {districts.length > 0
-            ? districts.map((d) => <div key={d.id} className="bg-surface-hover h-32 rounded-lg" />)
-            : Array.from({ length: 13 }, (_, i) => `placeholder-${i}`).map((placeholderKey) => (
-                <div key={placeholderKey} className="bg-surface-hover h-32 rounded-lg" />
-              ))}
+        <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+          {(districts.length > 0 ? districts : Array.from({ length: 13 }, (_, i) => `placeholder-${i}`)).map((d) => (
+            <div key={typeof d === 'string' ? d : d.id} className="h-24 animate-pulse bg-surface" />
+          ))}
         </div>
       ) : districts.length === 0 ? (
-        <p className="text-text-light/60">No districts found.</p>
+        <p className="p-5 text-sm text-text-dark/60">No districts found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           {districts.map((district) => (
             <Link
               key={district.id}
               href={`/districts/${district.slug}`}
-              className="group bg-surface border border-border rounded-lg p-4 hover:border-accent hover:shadow-md transition-all hover:bg-surface-hover"
+              className="group flex flex-col gap-0.5 border-r border-b border-border/70 p-4 transition-colors last:border-r-0 hover:bg-accent/5 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             >
-              <h3 className="font-bold text-sm group-hover:text-accent transition-colors">
-                {district.name.en}
-              </h3>
-              <p className="text-xs text-text-light/60 mb-3">{district.name.hi}</p>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span>Tehsils</span>
-                  <span className="font-semibold">{district.counts.tehsils}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span>Villages</span>
-                  <span className="font-semibold">{district.counts.villages}</span>
-                </div>
-              </div>
+              <span className="text-sm font-semibold group-hover:text-accent">{district.name.en}</span>
+              <span className="font-display text-xs text-text-dark/50">{district.name.hi}</span>
+              <span className="mt-2 flex gap-3 font-mono text-[11px] text-text-dark/55">
+                <span>{district.counts.tehsils} tehsils</span>
+                <span>{district.counts.villages.toLocaleString('en-IN')} villages</span>
+              </span>
             </Link>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DashboardLayout } from '@/components/layouts/dashboard-layout';
+import { PageHeader } from '@/components/molecules/page-header';
 import { AppSidebar } from '@/features/dashboard/components';
 import { fetchAllDistricts } from '@/features/dashboard/services';
 import { ComparisonTable, DistrictPicker } from '@/features/indicators/components';
@@ -35,39 +36,32 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   return (
     <DashboardLayout sidebar={<AppSidebar />}>
-      <div className="min-h-screen bg-bg-light">
-        <div className="bg-bg-dark text-text-dark py-8 px-6">
-          <h1 className="font-display text-4xl font-bold">Compare Districts</h1>
-          <p className="text-text-dark/70 mt-2">Side-by-side comparison across recorded indicators</p>
-        </div>
+      <PageHeader title="Compare Districts" titleHi="जिलों की तुलना" description="Side-by-side comparison across recorded indicators" />
 
-        <div className="p-6 space-y-6">
-          {districts === null ? (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              Unable to load the district list.
-            </div>
-          ) : (
-            <DistrictPicker districts={districts} a={a} b={b} />
-          )}
+      <div className="space-y-5 p-6 md:p-8">
+        {districts === null ? (
+          <div className="rounded-lg border border-alert-critical/30 bg-alert-critical/10 px-4 py-3 text-alert-critical">
+            Unable to load the district list.
+          </div>
+        ) : (
+          <DistrictPicker districts={districts} a={a} b={b} />
+        )}
 
-          {a && b && a === b && (
-            <p className="text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-4 py-3 text-sm">
-              Pick two different districts to compare.
-            </p>
-          )}
+        {a && b && a === b && (
+          <p className="rounded-lg border border-alert-warning/30 bg-alert-warning/10 px-4 py-3 text-sm text-alert-warning">
+            Pick two different districts to compare.
+          </p>
+        )}
 
-          {comparisonError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {comparisonError}
-            </div>
-          )}
+        {comparisonError && (
+          <div className="rounded-lg border border-alert-critical/30 bg-alert-critical/10 px-4 py-3 text-alert-critical">
+            {comparisonError}
+          </div>
+        )}
 
-          {comparison && <ComparisonTable result={comparison} nameA={nameA} nameB={nameB} />}
+        {comparison && <ComparisonTable result={comparison} nameA={nameA} nameB={nameB} />}
 
-          {!a || !b ? (
-            <p className="text-text-light/60 text-sm">Select two districts above to compare their indicators.</p>
-          ) : null}
-        </div>
+        {(!a || !b) && <p className="text-sm text-text-dark/60">Select two districts above to compare their indicators.</p>}
       </div>
     </DashboardLayout>
   );

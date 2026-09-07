@@ -1,92 +1,95 @@
-'use client';
+import { Card } from '@/components/molecules/card';
+import { SourceNote } from '@/components/molecules/source-note';
+import { cn } from '@/lib/utils';
 
-import React from 'react';
 import type { Alert } from '../schemas';
 
-interface AlertCardProps {
+export interface AlertCardProps {
   alert: Alert;
 }
 
-const SEVERITY_COLORS = {
-  minor: 'bg-blue-50 border-blue-200 text-blue-800',
-  moderate: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-  severe: 'bg-orange-50 border-orange-200 text-orange-800',
-  extreme: 'bg-red-50 border-red-200 text-red-800',
+type Tone = 'violet' | 'blue' | 'rust' | 'critical';
+
+/** Real alert `type` values, mapped to a distinct hue each — no fictional categories. */
+const TYPE_META: Record<Alert['type'], { label: string; tone: Tone }> = {
+  weather: { label: 'Weather', tone: 'violet' },
+  river: { label: 'River', tone: 'blue' },
+  flood: { label: 'Flood', tone: 'blue' },
+  road: { label: 'Road', tone: 'rust' },
+  disaster: { label: 'Disaster', tone: 'critical' },
 };
 
-const TYPE_ICONS = {
-  weather: '🌦️',
-  river: '🌊',
-  flood: '💧',
-  road: '🛣️',
-  disaster: '🚨',
+const TONE_BORDER: Record<Tone, string> = {
+  violet: 'border-l-violet',
+  blue: 'border-l-blue',
+  rust: 'border-l-rust',
+  critical: 'border-l-alert-critical',
 };
 
-const STATUS_BADGES = {
-  active: 'bg-green-100 text-green-800',
-  expired: 'bg-gray-100 text-gray-800',
-  cancelled: 'bg-gray-100 text-gray-800',
-  superseded: 'bg-gray-100 text-gray-800',
+const TONE_PILL: Record<Tone, string> = {
+  violet: 'bg-violet/10 text-violet',
+  blue: 'bg-blue/10 text-blue',
+  rust: 'bg-rust/10 text-rust',
+  critical: 'bg-alert-critical/10 text-alert-critical',
+};
+
+const SEVERITY_TEXT: Record<Alert['severity'], string> = {
+  minor: 'text-text-dark/55',
+  moderate: 'text-alert-warning',
+  severe: 'text-rust',
+  extreme: 'text-alert-critical font-semibold',
+};
+
+const STATUS_LABEL: Record<Alert['status'], string> = {
+  active: 'Active',
+  expired: 'Expired',
+  cancelled: 'Cancelled',
+  superseded: 'Superseded',
 };
 
 export function AlertCard({ alert }: AlertCardProps) {
-  const colorClass = SEVERITY_COLORS[alert.severity];
-  const statusClass = STATUS_BADGES[alert.status];
-  const icon = TYPE_ICONS[alert.type];
-
-  const issuedDate = new Date(alert.issuedAt);
-  const expiresDate = alert.expiresAt ? new Date(alert.expiresAt) : null;
-  const now = new Date();
-  const isExpired = expiresDate && expiresDate <= now;
+  const type = TYPE_META[alert.type];
+  const issuedAt = new Date(alert.issuedAt);
+  const expiresAt = alert.expiresAt ? new Date(alert.expiresAt) : null;
 
   return (
-    <div className={`border rounded-lg p-4 ${colorClass}`}>
-      <div className="flex items-start gap-3 mb-2">
-        <span className="text-2xl">{icon}</span>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-bold text-sm">{alert.headline}</h3>
-            <span className={`text-xs px-2 py-1 rounded ${statusClass}`}>
-              {alert.status}
-            </span>
-          </div>
-          <p className="text-xs opacity-75 mb-2">
-            {alert.authority} · Issued {issuedDate.toLocaleString('en-IN')}
-          </p>
-        </div>
-      </div>
-
-      {alert.areas && alert.areas.length > 0 && (
-        <div className="mb-2">
-          <p className="text-xs opacity-60">Affects:</p>
-          <div className="flex flex-wrap gap-1 mt-1">
-            {alert.areas.map((area) => (
-              <span
-                key={area.id}
-                className="text-xs bg-white/50 px-2 py-1 rounded"
-              >
-                {area.name.en}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {alert.body && (
-        <p className="text-sm mb-2 line-clamp-2">{alert.body}</p>
-      )}
-
-      <div className="flex items-center justify-between text-xs opacity-60">
-        <span>
+    <Card className={cn('border-l-4 p-4', TONE_BORDER[type.tone])}>
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <span className={cn('rounded px-2 py-0.5 font-mono text-xs tracking-wide uppercase', TONE_PILL[type.tone])}>
+          {type.label}
+        </span>
+        <span className={cn('text-xs', SEVERITY_TEXT[alert.severity])}>
           {alert.severity.charAt(0).toUpperCase() + alert.severity.slice(1)}
         </span>
-        {expiresDate && (
-          <span>
-            Expires: {expiresDate.toLocaleString('en-IN')}
-            {isExpired && ' (expired)'}
+        {alert.status !== 'active' && (
+          <span className="rounded bg-border/50 px-2 py-0.5 text-xs text-text-dark/60">
+            {STATUS_LABEL[alert.status]}
           </span>
         )}
+        <span className="ml-auto font-mono text-xs text-text-dark/50 whitespace-nowrap">
+          {issuedAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+        </span>
       </div>
-    </div>
+
+      <h3 className="text-base font-semibold">{alert.headline}</h3>
+      <p className="mt-0.5 text-xs text-text-dark/55">{alert.authority}</p>
+
+      {alert.areas.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {alert.areas.map((area) => (
+            <span key={area.id} className="rounded bg-surface-hover px-2 py-0.5 text-xs">
+              {area.name.en}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {alert.body && <p className="mt-2 line-clamp-2 text-sm text-text-dark/80">{alert.body}</p>}
+
+      <SourceNote>
+        Source: {alert.provenance?.department.en ?? alert.authority}
+        {expiresAt && ` · Expires ${expiresAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`}
+      </SourceNote>
+    </Card>
   );
 }

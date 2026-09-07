@@ -1,7 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
+import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
@@ -36,28 +39,47 @@ export function Sidebar({ alertCount = null }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside id="sidebar" className="sidebar">
-      <div className="sidebar-header">
-        <div className="logo">
-          <span className="logo-text">🏔️</span>
-          <span className="logo-name">Pahad Pulse</span>
+    <aside className="flex h-screen w-64 flex-none flex-col bg-bg-dark text-text-light">
+      <div className="flex items-center gap-3 border-b border-text-light/10 px-5 py-5">
+        <Image
+          src="/pahad-pulse/public/logo.png"
+          alt="Pahad Pulse logo"
+          width={40}
+          height={40}
+          className="flex-none rounded-xl"
+          priority
+        />
+        <div className="min-w-0">
+          <div className="font-display text-lg leading-none font-bold tracking-wide text-bg-light">PAHAD PULSE</div>
+          <div className="font-display text-sm leading-tight font-semibold text-orange-200">पहाड़ पल्स</div>
         </div>
-        <p className="tagline">Uttarakhand Intelligence Platform</p>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-3.5" aria-label="Primary">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           const badge = item.showAlertBadge && alertCount !== null && alertCount > 0 ? alertCount : null;
 
           return (
-            <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'active' : ''}`}>
-              <span className="nav-icon" aria-hidden="true">
-                {item.icon}
-              </span>
-              <span className="nav-label">{item.label}</span>
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm transition-colors',
+                'focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none',
+                isActive
+                  ? 'border-l-accent bg-text-light/10 font-semibold text-bg-light'
+                  : 'border-l-transparent text-text-light/80 hover:bg-text-light/10 hover:text-bg-light',
+              )}
+            >
+              <span aria-hidden="true">{item.icon}</span>
+              <span className="flex-1 leading-tight">{item.label}</span>
               {badge !== null && (
-                <span className="badge" aria-label={`${badge} active alerts`}>
+                <span
+                  className="rounded-md bg-accent/25 px-1.5 py-0.5 font-mono text-xs text-orange-200"
+                  aria-label={`${badge} active alerts`}
+                >
                   {badge}
                 </span>
               )}
@@ -66,8 +88,8 @@ export function Sidebar({ alertCount = null }: SidebarProps) {
         })}
       </nav>
 
-      <div className="sidebar-footer">
-        <p className="footer-text">Real government data, live updates</p>
+      <div className="border-t border-text-light/10 px-5 py-4">
+        <p className="text-center text-xs text-text-light/60">Real government data, live updates</p>
       </div>
     </aside>
   );

@@ -1,3 +1,8 @@
+import { Card } from '@/components/molecules/card';
+import { DashRow } from '@/components/molecules/dash-row';
+import { Kicker } from '@/components/molecules/kicker';
+import { SourceNote } from '@/components/molecules/source-note';
+
 import type { StateOverview } from '../types';
 
 export interface StateOverviewCardProps {
@@ -5,46 +10,48 @@ export interface StateOverviewCardProps {
   loading?: boolean;
 }
 
-const ITEMS: ReadonlyArray<{
+const ROWS: ReadonlyArray<{
   label: string;
-  icon: string;
-  value: (data: StateOverview) => string | null;
+  value: (d: StateOverview) => number | null;
+  format: (v: number) => string;
 }> = [
-  { label: 'Population', icon: '👥', value: (d) => (d.population === null ? null : `${(d.population / 1000000).toFixed(1)}M`) },
-  { label: 'Area', icon: '📍', value: (d) => (d.areaKmSq === null ? null : `${d.areaKmSq.toLocaleString('en-IN')} km²`) },
-  { label: 'Literacy Rate', icon: '📚', value: (d) => (d.literacy === null ? null : `${d.literacy}%`) },
-  { label: 'Districts', icon: '🗺️', value: (d) => String(d.districts) },
-  { label: 'Forest Coverage', icon: '🌲', value: (d) => (d.forestCoverage === null ? null : `${d.forestCoverage}%`) },
-  { label: 'Villages', icon: '🏘️', value: (d) => d.villages.toLocaleString('en-IN') },
+  { label: 'Population (2011)', value: (d) => d.population, format: (v) => v.toLocaleString('en-IN') },
+  { label: 'Geographical area', value: (d) => d.areaKmSq, format: (v) => `${v.toLocaleString('en-IN')} km²` },
+  { label: 'Literacy rate', value: (d) => d.literacy, format: (v) => `${v}%` },
+  { label: 'Districts', value: (d) => d.districts, format: (v) => String(v) },
+  { label: 'Forest cover', value: (d) => d.forestCoverage, format: (v) => `${v}% of area` },
+  { label: 'Villages', value: (d) => d.villages, format: (v) => v.toLocaleString('en-IN') },
 ];
 
 export function StateOverviewCard({ data, loading }: StateOverviewCardProps) {
   return (
-    <div className="bg-surface border border-border rounded-lg p-6 shadow-sm">
-      <h2 className="font-display text-2xl font-bold mb-6">Uttarakhand at a Glance</h2>
+    <Card className="p-5">
+      <h2 className="sr-only">Uttarakhand at a glance</h2>
+      <Kicker className="mb-3.5">State overview · राज्य</Kicker>
 
       {loading ? (
-        <div className="space-y-3 animate-pulse">
-          {ITEMS.map((item) => (
-            <div key={item.label} className="h-10 bg-surface-hover rounded" />
+        <div className="animate-pulse space-y-2.5">
+          {ROWS.map((row) => (
+            <div key={row.label} className="h-8 rounded bg-border/50" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {ITEMS.map((item) => {
-            const value = item.value(data);
-            return (
-              <div key={item.label} className="text-center">
-                <div className="text-3xl mb-2">{item.icon}</div>
-                <p className={value === null ? 'text-lg font-semibold text-text-light/50' : 'text-2xl font-bold text-accent'}>
-                  {value ?? 'Pending'}
-                </p>
-                <p className="text-xs text-text-light/60 mt-1">{item.label}</p>
-              </div>
-            );
-          })}
-        </div>
+        <>
+          <div className="flex flex-col">
+            {ROWS.map((row) => {
+              const raw = row.value(data);
+              return (
+                <DashRow
+                  key={row.label}
+                  label={row.label}
+                  value={raw === null ? <span className="text-text-dark/40">Pending</span> : row.format(raw)}
+                />
+              );
+            })}
+          </div>
+          <SourceNote>Source: Census of India 2011 · Directorate of Economics &amp; Statistics, Uttarakhand</SourceNote>
+        </>
       )}
-    </div>
+    </Card>
   );
 }

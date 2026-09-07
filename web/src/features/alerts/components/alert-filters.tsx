@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { cn } from '@/lib/utils';
+
 export interface AlertFiltersProps {
   type?: string;
   minSeverity?: string;
@@ -17,16 +19,17 @@ function buildHref(current: AlertFiltersProps, patch: Partial<AlertFiltersProps>
   return query ? `/alerts?${query}` : '/alerts';
 }
 
+const PILL_BASE =
+  'rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+const PILL_ON = 'border-forest bg-forest text-bg-light';
+const PILL_OFF = 'border-border bg-surface/70 text-text-dark/75 hover:border-forest/40';
+
 /** URL-driven filters — no client state; selecting a filter is a normal navigation. */
 export function AlertFilters({ type, minSeverity }: AlertFiltersProps) {
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-6" role="group" aria-label="Filter alerts">
+    <div className="mb-4 flex flex-wrap items-center gap-4" role="group" aria-label="Filter alerts">
       <div className="flex flex-wrap gap-2">
-        <Link
-          href={buildHref({ type, minSeverity }, { type: undefined })}
-          aria-current={!type}
-          className={`text-xs px-3 py-1 rounded border ${!type ? 'bg-accent text-white border-accent' : 'bg-surface border-border'}`}
-        >
+        <Link href={buildHref({ type, minSeverity }, { type: undefined })} aria-current={!type} className={cn(PILL_BASE, !type ? PILL_ON : PILL_OFF)}>
           All types
         </Link>
         {TYPES.map((t) => (
@@ -34,7 +37,7 @@ export function AlertFilters({ type, minSeverity }: AlertFiltersProps) {
             key={t}
             href={buildHref({ type, minSeverity }, { type: t })}
             aria-current={type === t}
-            className={`text-xs px-3 py-1 rounded border capitalize ${type === t ? 'bg-accent text-white border-accent' : 'bg-surface border-border'}`}
+            className={cn(PILL_BASE, type === t ? PILL_ON : PILL_OFF)}
           >
             {t}
           </Link>
@@ -45,7 +48,7 @@ export function AlertFilters({ type, minSeverity }: AlertFiltersProps) {
         <Link
           href={buildHref({ type, minSeverity }, { minSeverity: undefined })}
           aria-current={!minSeverity}
-          className={`text-xs px-3 py-1 rounded border ${!minSeverity ? 'bg-accent text-white border-accent' : 'bg-surface border-border'}`}
+          className={cn(PILL_BASE, !minSeverity ? PILL_ON : PILL_OFF)}
         >
           Any severity
         </Link>
@@ -54,7 +57,7 @@ export function AlertFilters({ type, minSeverity }: AlertFiltersProps) {
             key={s}
             href={buildHref({ type, minSeverity }, { minSeverity: s })}
             aria-current={minSeverity === s}
-            className={`text-xs px-3 py-1 rounded border capitalize ${minSeverity === s ? 'bg-accent text-white border-accent' : 'bg-surface border-border'}`}
+            className={cn(PILL_BASE, minSeverity === s ? PILL_ON : PILL_OFF)}
           >
             {s}+
           </Link>

@@ -1,3 +1,7 @@
+import { Card } from '@/components/molecules/card';
+import { Kicker } from '@/components/molecules/kicker';
+import { cn } from '@/lib/utils';
+
 import type { LiveCounters } from '../types';
 
 export interface LiveCountersProps {
@@ -5,57 +9,75 @@ export interface LiveCountersProps {
   loading?: boolean;
 }
 
+type Tone = 'rust' | 'accent' | 'forest' | 'blue';
+
+const TONE_DOT: Record<Tone, string> = {
+  rust: 'bg-rust',
+  accent: 'bg-accent',
+  forest: 'bg-forest',
+  blue: 'bg-blue',
+};
+
+const TONE_TEXT: Record<Tone, string> = {
+  rust: 'text-rust',
+  accent: 'text-accent',
+  forest: 'text-forest',
+  blue: 'text-blue',
+};
+
 const COUNTERS: ReadonlyArray<{
   label: string;
   unit: string;
-  color: string;
+  tone: Tone;
   value: (data: LiveCounters) => number | null;
+  format: (value: number) => string;
 }> = [
-  { label: 'Active Alerts', unit: 'now', color: 'bg-red-100 text-red-700', value: (d) => d.activeAlerts },
-  { label: 'Tourists in State', unit: 'people', color: 'bg-blue-100 text-blue-700', value: (d) => d.touristsInState },
-  { label: 'Closed Roads', unit: 'segments', color: 'bg-orange-100 text-orange-700', value: (d) => d.closedRoads },
+  { label: 'Active alerts', unit: 'now', tone: 'rust', value: (d) => d.activeAlerts, format: (v) => v.toLocaleString('en-IN') },
   {
-    label: 'Connectivity',
-    unit: 'online',
-    color: 'bg-green-100 text-green-700',
-    value: (d) => d.connectivityPercentage,
+    label: 'Tourists in state',
+    unit: 'people',
+    tone: 'accent',
+    value: (d) => d.touristsInState,
+    format: (v) => v.toLocaleString('en-IN'),
   },
+  { label: 'Closed roads', unit: 'segments', tone: 'forest', value: (d) => d.closedRoads, format: (v) => v.toLocaleString('en-IN') },
+  { label: 'Connectivity', unit: 'online', tone: 'blue', value: (d) => d.connectivityPercentage, format: (v) => `${v}%` },
 ];
 
 export function LiveCounters({ data, loading }: LiveCountersProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
+    <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-4">
       {COUNTERS.map((counter) => {
         const value = counter.value(data);
         return (
-          <div
-            key={counter.label}
-            className={`${counter.color} p-6 rounded-lg shadow-sm border border-current border-opacity-20`}
-          >
+          <Card key={counter.label} className="p-4">
             {loading ? (
-              <div className="space-y-2 animate-pulse">
-                <div className="h-8 bg-current opacity-20 rounded w-3/4" />
-                <div className="h-4 bg-current opacity-20 rounded w-1/2" />
+              <div className="animate-pulse space-y-2">
+                <div className="h-3 w-1/2 rounded bg-border" />
+                <div className="h-8 w-3/4 rounded bg-border" />
               </div>
             ) : (
               <>
-                <p className="text-sm font-medium opacity-75">{counter.label}</p>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className={cn('size-1.5 flex-none rounded-full', TONE_DOT[counter.tone])} aria-hidden="true" />
+                  <Kicker>{counter.label}</Kicker>
+                </div>
                 {value === null ? (
                   <>
-                    <p className="text-2xl font-bold mt-2">Pending</p>
-                    <p className="text-xs opacity-60 mt-1">no data source connected</p>
+                    <p className="font-display text-2xl font-semibold text-text-dark/35">Pending</p>
+                    <p className="mt-1 text-xs text-text-dark/45">No data source connected</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-3xl font-bold mt-2">
-                      {counter.label === 'Connectivity' ? `${value}%` : value.toLocaleString('en-IN')}
+                    <p className={cn('font-display text-4xl leading-none font-semibold', TONE_TEXT[counter.tone])}>
+                      {counter.format(value)}
                     </p>
-                    <p className="text-xs opacity-60 mt-1">{counter.unit}</p>
+                    <p className="mt-1.5 text-xs text-text-dark/50">{counter.unit}</p>
                   </>
                 )}
               </>
             )}
-          </div>
+          </Card>
         );
       })}
     </div>

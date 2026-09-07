@@ -2,13 +2,19 @@
 
 import { useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+import { Card } from '@/components/molecules/card';
 import type { DistrictSummary } from '@/features/dashboard/schemas';
+import { cn } from '@/lib/utils';
 
 export interface DistrictPickerProps {
   districts: DistrictSummary[];
   a?: string;
   b?: string;
 }
+
+const SELECT_CLASS =
+  'w-full rounded-md border-2 bg-surface/80 px-3 py-2 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none';
 
 /** Two district selects, backed entirely by URL state (`?a=slug&b=slug`). */
 export function DistrictPicker({ districts, a, b }: DistrictPickerProps) {
@@ -27,14 +33,10 @@ export function DistrictPicker({ districts, a, b }: DistrictPickerProps) {
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <Card className="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
       <label className="block">
-        <span className="text-sm font-semibold block mb-1">First district</span>
-        <select
-          value={a ?? ''}
-          onChange={(e) => setParam('a', e.target.value)}
-          className="w-full border border-border rounded px-3 py-2 bg-surface"
-        >
+        <span className="mb-1 block text-sm font-semibold">First district</span>
+        <select value={a ?? ''} onChange={(e) => setParam('a', e.target.value)} className={cn(SELECT_CLASS, 'border-forest text-forest')}>
           <option value="">Select a district</option>
           {districts.map((d) => (
             <option key={d.slug} value={d.slug}>
@@ -45,12 +47,8 @@ export function DistrictPicker({ districts, a, b }: DistrictPickerProps) {
       </label>
 
       <label className="block">
-        <span className="text-sm font-semibold block mb-1">Second district</span>
-        <select
-          value={b ?? ''}
-          onChange={(e) => setParam('b', e.target.value)}
-          className="w-full border border-border rounded px-3 py-2 bg-surface"
-        >
+        <span className="mb-1 block text-sm font-semibold">Second district</span>
+        <select value={b ?? ''} onChange={(e) => setParam('b', e.target.value)} className={cn(SELECT_CLASS, 'border-accent text-accent')}>
           <option value="">Select a district</option>
           {districts.map((d) => (
             <option key={d.slug} value={d.slug}>
@@ -59,6 +57,6 @@ export function DistrictPicker({ districts, a, b }: DistrictPickerProps) {
           ))}
         </select>
       </label>
-    </div>
+    </Card>
   );
 }
