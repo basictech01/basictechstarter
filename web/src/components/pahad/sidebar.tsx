@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { NAV, type ScreenId } from '@/lib/pahad-data'
 
 export default function Sidebar({
@@ -31,50 +32,24 @@ export default function Sidebar({
     >
       <div
         style={{
-          padding: '24px 22px 20px',
+          padding: '8px',
           display: 'flex',
-          gap: 13,
           alignItems: 'center',
-          borderBottom: '1px solid rgba(255,255,255,.12)',
+          justifyContent: 'center',
+          background: '#F5F5F5',
+          borderBottom: '1px solid rgba(20,32,28,.12)',
+          minHeight: '140px',
+          overflow: 'hidden',
         }}
       >
-        <svg viewBox="0 0 40 40" width="44" height="44" style={{ flex: 'none', borderRadius: 12 }} aria-hidden="true">
-          <rect width="40" height="40" rx="12" fill="#FAF8F4" />
-          <path d="M5 30 L15 14 L21 24 L26 17 L35 30 Z" fill="#10241D" />
-          <path
-            d="M5 29.5 h4.6 l2.6-4.6 3.2 9.2 3-11.4 2.8 6.8 H35"
-            fill="none"
-            stroke="#E4681F"
-            strokeWidth="2.6"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-        </svg>
-        <div>
-          <div
-            style={{
-              fontFamily: 'var(--font-anek), sans-serif',
-              fontWeight: 700,
-              fontSize: 20,
-              letterSpacing: '.03em',
-              lineHeight: 1,
-              color: '#FAF8F4',
-            }}
-          >
-            PAHAD PULSE
-          </div>
-          <div
-            style={{
-              fontFamily: 'var(--font-anek), sans-serif',
-              fontSize: 14,
-              color: '#F0A268',
-              fontWeight: 600,
-              lineHeight: 1.4,
-            }}
-          >
-            पहाड़ पल्स
-          </div>
-        </div>
+        <Image
+          src="/pahad-pulse/public/logo.png"
+          alt="Pahad Pulse Logo"
+          width={250}
+          height={250}
+          style={{ borderRadius: 14 }}
+          priority
+        />
       </div>
 
       <nav
